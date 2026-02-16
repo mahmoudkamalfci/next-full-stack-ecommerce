@@ -58,8 +58,10 @@ export default function ProductPage() {
                     </div>
 
                     <div className="flex gap-4 mt-4">
-                        <Button className="flex-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-full py-6">Add to cart</Button>
-                        <Button className="flex-1 bg-black hover:bg-gray-800 text-white rounded-full py-6">Buy it now</Button>
+                        <Button variant="secondary" className="flex-1 rounded-full py-6">
+                            Add to cart
+                        </Button>
+                        <Button variant="default" className="flex-1 rounded-full py-6">Buy it now</Button>
                     </div>
                 </div>
             </div>
