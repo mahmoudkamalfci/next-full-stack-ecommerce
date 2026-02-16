@@ -1,6 +1,8 @@
 import { ProductImageCarousel } from "@/components/product-image-carousel";
 import { Button } from "@/components/ui/button";
 
+import { AddToCartDrawer } from "@/components/add-to-cart-drawer";
+
 export default function ProductPage() {
     const images = [
         "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80",
@@ -58,9 +60,16 @@ export default function ProductPage() {
                     </div>
 
                     <div className="flex gap-4 mt-4">
-                        <Button variant="secondary" className="flex-1 rounded-full py-6">
-                            Add to cart
-                        </Button>
+                        <AddToCartDrawer
+                            productImage={images[0] || ""}
+                            productTitle="Core Joggers"
+                            productPrice="LE 699.00"
+                            variantText="Burgundy / XS/S"
+                        >
+                            <Button variant="secondary" className="flex-1 rounded-full py-6 w-full">
+                                Add to cart
+                            </Button>
+                        </AddToCartDrawer>
                         <Button variant="default" className="flex-1 rounded-full py-6">Buy it now</Button>
                     </div>
                 </div>
