@@ -8,7 +8,6 @@ import {
     Drawer,
     DrawerClose,
     DrawerContent,
-    DrawerDescription, // Keep unused import if it was there, or remove it. It was there.
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
@@ -79,18 +78,16 @@ export function AddToCartDrawer({
                     </div>
                     <DrawerFooter>
                         {/* order notes form  */}
-                        <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${showOrderNote ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-                            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showOrderNote ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-                                <form className="mb-4">
-                                    <div className="space-y-4">
-                                        <Label htmlFor="order-note" className="text-xl font-bold">Order note</Label>
-                                        <Textarea id="order-note" placeholder="Order note" className="min-h-[100px]" />
-                                    </div>
-                                    <div className="space-y-2 mt-4">
-                                        <Button type="button" onClick={() => setShowOrderNote(false)} className="rounded-full h-12 px-6">Save</Button>
-                                    </div>
-                                </form>
-                            </div>
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showOrderNote ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
+                            <form className="mb-4">
+                                <div className="space-y-4">
+                                    <Label htmlFor="order-note" className="text-xl font-bold">Order note</Label>
+                                    <Textarea id="order-note" placeholder="Order note" className="min-h-[100px]" />
+                                </div>
+                                <div className="space-y-2 mt-4">
+                                    <Button type="button" onClick={() => setShowOrderNote(false)} className="rounded-full h-12 px-6">Save</Button>
+                                </div>
+                            </form>
                         </div>
                         <div className="border-t pt-4 mt-4 space-y-4">
                             <div className="flex justify-between items-center font-bold text-lg">

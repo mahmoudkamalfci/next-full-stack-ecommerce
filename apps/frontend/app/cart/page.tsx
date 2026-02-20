@@ -1,17 +1,14 @@
+import { CartClient } from "./cart-client"
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+export const metadata = {
+    title: "Shopping Cart",
+}
 
 export default function CartPage() {
     return (
-        <div className="container mx-auto py-16 px-4">
-            <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
-            <div className="text-center py-12">
-                <p className="text-gray-500 mb-6">Your cart is currently empty.</p>
-                <Button asChild>
-                    <Link href="/">Continue Shopping</Link>
-                </Button>
-            </div>
+        <div className="container max-w-6xl mx-auto py-12 px-4 md:px-6">
+            <h1 className="text-3xl md:text-4xl font-bold text-center mb-10 text-gray-900">Cart</h1>
+            <CartClient />
         </div>
     )
 }

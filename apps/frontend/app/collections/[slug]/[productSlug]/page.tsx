@@ -1,7 +1,6 @@
 import { ProductImageCarousel } from "@/components/product-image-carousel";
-import { Button } from "@/components/ui/button";
-
-import { AddToCartDrawer } from "@/components/add-to-cart-drawer";
+import { ProductInfo } from "@/components/product-info";
+import { ProductDetails } from "@/components/product-desc";
 
 export default function ProductPage() {
     const images = [
@@ -15,6 +14,7 @@ export default function ProductPage() {
         "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?w=800&q=80",
     ];
 
+
     return (
         <div className="container mx-auto px-4 py-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-24">
@@ -24,55 +24,11 @@ export default function ProductPage() {
                 </div>
 
                 {/* Right Column: Product Details */}
-                <div className="flex flex-col gap-4">
-                    <h1 className="text-3xl font-bold">Core Joggers</h1>
-                    <p className="text-gray-500 text-sm">SKU: UMJR-174-2411-XS/S-BRG</p>
-                    <p className="text-xl font-semibold">LE 699.00</p>
+                <ProductInfo images={images} />
+            </div>
 
-
-
-                    <div>
-                        <p className="font-semibold mb-2">Size: XS/S</p>
-                        <div className="flex gap-2">
-                            <Button variant="outline" className="rounded-full border-black">XS/S</Button>
-                            <Button variant="outline" className="rounded-full">M/L</Button>
-                            <Button variant="outline" className="rounded-full">XL/2XL</Button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p className="font-semibold mb-2">Color: Burgundy</p>
-                        <div className="flex gap-2">
-                            <button className="w-8 h-8 rounded-full bg-red-900 border-2 border-white ring-1 ring-black"></button>
-                            <button className="w-8 h-8 rounded-full bg-black border-2 border-white ring-1 ring-gray-200"></button>
-                            <button className="w-8 h-8 rounded-full bg-white border-2 border-gray-200"></button>
-                            <button className="w-8 h-8 rounded-full bg-red-700 border-2 border-white ring-1 ring-gray-200"></button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p className="font-semibold mb-2">Quantity:</p>
-                        <div className="flex items-center border rounded-md w-fit">
-                            <button className="px-3 py-1 bg-white hover:bg-gray-100">-</button>
-                            <span className="px-3 py-1 border-x">1</span>
-                            <button className="px-3 py-1 bg-white hover:bg-gray-100">+</button>
-                        </div>
-                    </div>
-
-                    <div className="flex gap-4 mt-4">
-                        <AddToCartDrawer
-                            productImage={images[0] || ""}
-                            productTitle="Core Joggers"
-                            productPrice="LE 699.00"
-                            variantText="Burgundy / XS/S"
-                        >
-                            <Button variant="secondary" className="flex-1 rounded-full py-6 w-full">
-                                Add to cart
-                            </Button>
-                        </AddToCartDrawer>
-                        <Button variant="default" className="flex-1 rounded-full py-6">Buy it now</Button>
-                    </div>
-                </div>
+            <div>
+                <ProductDetails />
             </div>
         </div>
     )
