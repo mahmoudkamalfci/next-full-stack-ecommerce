@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { Lock, Package } from "lucide-react"
 
 import { useCartStore } from "@/stores/useCartStore"
@@ -24,13 +24,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormMessage,
-} from "@/components/ui/form"
+import { Field, FieldError, FieldGroup } from "@/components/ui/field"
 
 export function CartClient() {
     const [mounted, setMounted] = useState(false)
@@ -218,26 +212,27 @@ export function CartClient() {
                     </p>
 
                     <div className="pt-2">
-                        <Form {...form}>
-                            <form className="space-y-4">
-                                <FormField
-                                    control={form.control}
+                        <form className="space-y-4">
+                            <FieldGroup>
+                                <Controller
                                     name="orderNote"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <Textarea
-                                                    placeholder="Order note"
-                                                    className="resize-none h-28 text-sm bg-white"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                            <Textarea
+                                                placeholder="Order note"
+                                                className="resize-none h-28 text-sm bg-white"
+                                                aria-invalid={fieldState.invalid}
+                                                {...field}
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError errors={[fieldState.error]} />
+                                            )}
+                                        </Field>
                                     )}
                                 />
-                            </form>
-                        </Form>
+                            </FieldGroup>
+                        </form>
                     </div>
 
                     <Button className="w-full rounded-full h-14 mt-4 bg-[#1c1c1c] hover:bg-black text-white text-base font-semibold flex gap-2.5 items-center justify-center shadow-none transition-all">
