@@ -1,0 +1,1 @@
+Use superpowers:executing-plans to implement docs/plans/2026-02-24-database-api-implementation.md task-by-task. Stay strictly to the plan.
