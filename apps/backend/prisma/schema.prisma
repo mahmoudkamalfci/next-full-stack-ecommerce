@@ -19,41 +19,41 @@ enum Role {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  email         String    @unique
-  passwordHash  String
-  firstName     String
-  lastName      String
-  role          Role      @default(CUSTOMER)
-  createdAt     DateTime  @default(now())
-  addresses     Address[]
-  orders        Order[]
-  cart          Cart?
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         Role      @default(CUSTOMER)
+  createdAt    DateTime  @default(now())
+  addresses    Address[]
+  orders       Order[]
+  cart         Cart?
 }
 
 model Address {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  street      String
-  city        String
-  state       String
-  zip         String
-  country     String
-  isDefault   Boolean  @default(false)
-  orders      Order[]
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id])
+  street    String
+  city      String
+  state     String
+  zip       String
+  country   String
+  isDefault Boolean @default(false)
+  orders    Order[]
 }
 
 model Category {
-  id          Int       @id @default(autoincrement())
+  id          Int               @id @default(autoincrement())
   parentId    Int?
-  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryHierarchy")
+  parent      Category?         @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[]        @relation("CategoryHierarchy")
   name        String
-  slug        String    @unique
-  description String?   @db.Text
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
+  slug        String            @unique
+  description String?           @db.Text
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
   products    ProductCategory[]
 }
 
@@ -70,28 +70,28 @@ model Product {
 }
 
 model ProductCategory {
-  productId   Int
-  categoryId  Int
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  productId  Int
+  categoryId Int
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([productId, categoryId])
 }
 
 model ProductOption {
-  id          Int                  @id @default(autoincrement())
-  productId   Int
-  product     Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
-  name        String               // e.g., 'Size', 'Color'
-  values      ProductOptionValue[]
+  id        Int                  @id @default(autoincrement())
+  productId Int
+  product   Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String // e.g., 'Size', 'Color'
+  values    ProductOptionValue[]
 }
 
 model ProductOptionValue {
-  id          Int                  @id @default(autoincrement())
-  optionId    Int
-  option      ProductOption        @relation(fields: [optionId], references: [id], onDelete: Cascade)
-  value       String               // e.g., 'Small', 'Red'
-  variants    VariantOptionValue[]
+  id       Int                  @id @default(autoincrement())
+  optionId Int
+  option   ProductOption        @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  value    String // e.g., 'Small', 'Red'
+  variants VariantOptionValue[]
 }
 
 model ProductVariant {
@@ -124,12 +124,12 @@ enum OrderStatus {
 }
 
 model Cart {
-  id          Int        @id @default(autoincrement())
-  userId      Int?       @unique // Nullable for guests
-  user        User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId   String?    @unique // Present for guests
-  updatedAt   DateTime   @updatedAt
-  items       CartItem[]
+  id        Int        @id @default(autoincrement())
+  userId    Int?       @unique // Nullable for guests
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String?    @unique // Present for guests
+  updatedAt DateTime   @updatedAt
+  items     CartItem[]
 }
 
 model CartItem {
@@ -143,7 +143,7 @@ model CartItem {
 
 model Order {
   id                Int         @id @default(autoincrement())
-  userId            Int?        // Nullable for guests
+  userId            Int? // Nullable for guests
   user              User?       @relation(fields: [userId], references: [id])
   guestEmail        String?
   shippingAddressId Int?
