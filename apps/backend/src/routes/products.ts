@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { prisma } from '../lib/prisma.js';
+import { prisma } from '../lib/prisma';
 export const productRouter: Router = Router();
 
 productRouter.get('/', (req, res) => { res.json({ msg: 'products' }) });

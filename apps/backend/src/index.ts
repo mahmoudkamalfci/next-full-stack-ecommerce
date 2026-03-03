@@ -1,10 +1,9 @@
 import express from 'express';
 
-import { prisma } from './lib/prisma.js';
-import { productRouter } from './routes/products.js';
-import { categoryRouter } from './routes/categories.js';
-import { cartRouter } from './routes/cart.js';
-import { checkoutRouter } from './routes/checkout.js';
+import { productRouter } from './routes/products';
+import { categoryRouter } from './routes/categories';
+import { cartRouter } from './routes/cart';
+import { checkoutRouter } from './routes/checkout';
 
 const app = express();
 const port = process.env.PORT || 4000;
