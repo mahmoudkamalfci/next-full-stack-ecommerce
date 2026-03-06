@@ -26,6 +26,12 @@
         "^check-types"
       ]
     },
+    "test": {
+      "outputs": [
+        "coverage/**"
+      ],
+      "cache": true
+    },
     "dev": {
       "cache": false,
       "persistent": true
