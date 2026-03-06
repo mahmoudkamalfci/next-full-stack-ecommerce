@@ -1,12 +1,12 @@
-import express from 'express';
+import express, { type Express } from 'express';
 
-import { productRouter } from './routes/products';
-import { categoryRouter } from './routes/categories';
-import { cartRouter } from './routes/cart';
-import { checkoutRouter } from './routes/checkout';
+import { productRouter } from './routes/products.js';
+import { categoryRouter } from './routes/categories.js';
+import { cartRouter } from './routes/cart.js';
+import { checkoutRouter } from './routes/checkout.js';
+import { notFoundHandler, globalErrorHandler } from './middleware/errorHandler.js';
 
-const app = express();
-const port = process.env.PORT || 4000;
+export const app: Express = express();
 
 app.use(express.json());
 
@@ -19,6 +19,15 @@ app.get('/', (req, res) => {
   res.send('Hello from Backend!');
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+// --- Error handling (must be registered AFTER all routes) ---
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
+
+// Only start listening when this file is run directly (not imported by tests)
+const port = process.env.PORT || 4000;
+
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}
