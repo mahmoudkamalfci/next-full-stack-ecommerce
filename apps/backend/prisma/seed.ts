@@ -59,6 +59,79 @@ async function main() {
     )
   );
 
+  console.log('Seeding Products and Variants...');
+  
+  for (let i = 0; i < 15; i++) {
+    const productName = faker.commerce.productName();
+    
+    // Choose random category
+    const category = faker.helpers.arrayElement(categories);
+
+    // Create the base product
+    const product = await prisma.product.create({
+      data: {
+        name: productName,
+        slug: faker.helpers.slugify(productName + '-' + faker.string.alphanumeric(4)).toLowerCase(),
+        description: faker.commerce.productDescription(),
+        categories: {
+            create: {
+                category: { connect: { id: category.id } }
+            }
+        }
+      }
+    });
+
+    // Create Options: Size and Color
+    const sizeOption = await prisma.productOption.create({
+        data: {
+            productId: product.id,
+            name: 'Size',
+            values: {
+                create: [
+                    { value: 'S' },
+                    { value: 'M' },
+                    { value: 'L' }
+                ]
+            }
+        },
+        include: { values: true }
+    });
+
+    const colorOption = await prisma.productOption.create({
+        data: {
+            productId: product.id,
+            name: 'Color',
+            values: {
+                create: [
+                    { value: 'Red' },
+                    { value: 'Blue' }
+                ]
+            }
+        },
+        include: { values: true }
+    });
+
+    // Generate Cartesian Product of Option Values to form Variants
+    for (const size of sizeOption.values) {
+        for (const color of colorOption.values) {
+            await prisma.productVariant.create({
+               data: {
+                   productId: product.id,
+                   sku: `${product.id}-${size.value}-${color.value}`.toUpperCase(),
+                   price: faker.commerce.price({ min: 10, max: 200 }),
+                   inventoryQuantity: faker.number.int({ min: 0, max: 100 }),
+                   optionValues: {
+                       create: [
+                           { optionValue: { connect: { id: size.id } } },
+                           { optionValue: { connect: { id: color.id } } }
+                       ]
+                   }
+               }
+            });
+        }
+    }
+  }
+
   console.log('Seeding complete.');
 }
 
