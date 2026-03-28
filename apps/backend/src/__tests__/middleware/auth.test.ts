@@ -1,4 +1,4 @@
-import { authenticateToken } from '../../middleware/auth';
+import { authenticateToken } from '../../middleware/auth.js';
 import type { Request, Response, NextFunction } from 'express';
 import { jest, describe, it, expect } from '@jest/globals';
 
