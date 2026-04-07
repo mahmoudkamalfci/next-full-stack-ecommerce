@@ -5,6 +5,7 @@ import { categoryRouter } from './routes/categories.js';
 import { cartRouter } from './routes/cart.js';
 import { checkoutRouter } from './routes/checkout.js';
 import { userRouter } from './routes/user.routes.js';
+import { adminRouter } from './routes/admin.routes.js';
 import { notFoundHandler, globalErrorHandler } from './middleware/errorHandler.js';
 
 export const app: Express = express();
@@ -16,6 +17,7 @@ app.use('/api/categories', categoryRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/checkout', checkoutRouter);
 app.use('/api/users', userRouter);
+app.use('/api/admin', adminRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello from Backend!');
