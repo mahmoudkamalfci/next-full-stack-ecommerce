@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { config } from '../lib/config.js';
-import { ConflictError, BadRequestError } from '../middleware/errorHandler.js';
+import { ConflictError, BadRequestError, NotFoundError } from '../middleware/errorHandler.js';
 
 export class UserService {
   static async register(email: string, password: string, firstName: string, lastName: string) {
@@ -80,5 +80,23 @@ export class UserService {
     });
 
     return { message: 'Password has been reset successfully' };
+  }
+
+  static async getProfile(userId: number) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundError('User not found');
+
+    const { passwordHash, resetToken, resetTokenExpiry, ...safeUser } = user;
+    return safeUser;
+  }
+
+  static async updateProfile(userId: number, data: { firstName?: string; lastName?: string }) {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data
+    });
+    
+    const { passwordHash, resetToken, resetTokenExpiry, ...safeUser } = updatedUser;
+    return safeUser;
   }
 }
