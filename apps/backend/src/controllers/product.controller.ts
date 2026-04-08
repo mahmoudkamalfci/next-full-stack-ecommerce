@@ -1,5 +1,26 @@
 import { Request, Response } from 'express';
+import { getProductsQuerySchema } from '../schemas/product.schema.js';
+import * as ProductService from '../services/product.service.js';
 
 export const getProducts = async (req: Request, res: Response) => {
-  res.status(200).json({ data: [], pagination: {} });
+  try {
+    const validatedQuery = getProductsQuerySchema.parse(req.query);
+    const result = await ProductService.findProducts(validatedQuery);
+    
+    res.status(200).json({
+      data: result.data,
+      pagination: {
+        total: result.total,
+        page: validatedQuery.page,
+        totalPages: Math.ceil(result.total / validatedQuery.limit)
+      }
+    });
+  } catch (error: any) {
+    if (error.name === 'ZodError') {
+      res.status(400).json({ error: error.errors });
+    } else {
+      console.error('Controller Error:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
 };
