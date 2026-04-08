@@ -24,3 +24,19 @@ export const getProducts = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const getProductBySlug = async (req: Request<{ slug: string }>, res: Response) => {
+  try {
+    const { slug } = req.params;
+    const product = await ProductService.getProductBySlug(slug);
+    
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    res.status(200).json({ data: product });
+  } catch (error: any) {
+    console.error('Controller Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

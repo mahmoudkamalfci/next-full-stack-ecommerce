@@ -21,3 +21,15 @@ export const findProducts = async (filters: { q?: string; categorySlug?: string;
 
   return { data, total };
 };
+
+export const getProductBySlug = async (slug: string) => {
+  const product = await prisma.product.findUnique({
+    where: { slug, isActive: true },
+    include: {
+      categories: { include: { category: true } },
+      options: { include: { values: true } },
+      variants: { include: { optionValues: { include: { optionValue: true } } } }
+    }
+  });
+  return product;
+};
