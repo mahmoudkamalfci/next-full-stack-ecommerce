@@ -1,7 +1,5 @@
 # User Module Completion Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
-
 **Goal:** Complete the backend user module by implementing missing authentication endpoints (login, password reset), profile management, and admin CRUD, while hardening security and validation.
 
 **Architecture:** Service-Controller pattern with centralized config, custom error classes, and Zod validation middleware. Admin routes are separated into their own router.
