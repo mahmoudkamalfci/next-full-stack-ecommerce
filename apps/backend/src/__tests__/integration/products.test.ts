@@ -14,6 +14,8 @@ describe('Products API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.NODE_ENV = 'test';
+    (mockPrisma.product.findMany as any).mockResolvedValue([]);
+    (mockPrisma.product.count as any).mockResolvedValue(0);
   });
 
   // ─── GET /api/products ──────────────────────────────────────────
@@ -23,7 +25,14 @@ describe('Products API', () => {
       const res = await request(app).get('/api/products');
 
       expect(res.status).toBe(200);
-      expect(res.body).toEqual({ msg: 'products' });
+      expect(res.body).toEqual({
+        data: [],
+        pagination: {
+          total: 0,
+          page: 1,
+          totalPages: 0
+        }
+      });
     });
   });
 
@@ -67,9 +76,9 @@ describe('Products API', () => {
       const res = await request(app).get('/api/products/test-product');
 
       expect(res.status).toBe(200);
-      expect(res.body).toEqual(mockProduct);
+      expect(res.body).toEqual({ data: mockProduct });
       expect(mockPrisma.product.findUnique).toHaveBeenCalledWith({
-        where: { slug: 'test-product' },
+        where: { slug: 'test-product', isActive: true },
         include: {
           categories: { include: { category: true } },
           options: {
@@ -92,7 +101,7 @@ describe('Products API', () => {
       const res = await request(app).get('/api/products/non-existent');
 
       expect(res.status).toBe(404);
-      expect(res.body).toEqual({ error: 'Product not found' });
+      expect(res.body).toEqual({ status: 'error', message: 'Product not found' });
     });
 
     it('should return 500 when there is a database error', async () => {
@@ -103,7 +112,7 @@ describe('Products API', () => {
       const res = await request(app).get('/api/products/test-product');
 
       expect(res.status).toBe(500);
-      expect(res.body).toEqual({ error: 'Failed to fetch product' });
+      expect(res.body).toEqual({ status: 'error', message: 'Internal server error' });
     });
   });
 });

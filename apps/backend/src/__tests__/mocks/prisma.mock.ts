@@ -9,6 +9,7 @@ const mockPrisma: any = {
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+    count: jest.fn(),
   },
   category: {
     findMany: jest.fn(),
