@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { getProductsQuerySchema } from '../schemas/product.schema.js';
 import * as ProductService from '../services/product.service.js';
+import { NotFoundError, BadRequestError } from '../middleware/errorHandler.js';
 
-export const getProducts = async (req: Request, res: Response) => {
+export const getProducts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validatedQuery = getProductsQuerySchema.parse(req.query);
     const result = await ProductService.findProducts(validatedQuery);
@@ -17,26 +18,24 @@ export const getProducts = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      res.status(400).json({ error: error.errors });
+      next(new BadRequestError('Validation failed: ' + error.errors.map((e: any) => e.message).join(', ')));
     } else {
-      console.error('Controller Error:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      next(error);
     }
   }
 };
 
-export const getProductBySlug = async (req: Request<{ slug: string }>, res: Response) => {
+export const getProductBySlug = async (req: Request<{ slug: string }>, res: Response, next: NextFunction) => {
   try {
     const { slug } = req.params;
     const product = await ProductService.getProductBySlug(slug);
     
     if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
+      return next(new NotFoundError('Product not found'));
     }
     
     res.status(200).json({ data: product });
   } catch (error: any) {
-    console.error('Controller Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    next(error);
   }
 };

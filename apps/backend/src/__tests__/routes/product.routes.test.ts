@@ -2,6 +2,7 @@ import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import { mockPrisma } from '../mocks/prisma.mock.js';
+import { globalErrorHandler } from '../../middleware/errorHandler.js';
 
 jest.unstable_mockModule('../../lib/prisma.js', () => ({
   prisma: mockPrisma,
@@ -11,6 +12,7 @@ const { default: productRoutes } = await import('../../routes/product.routes.js'
 
 const app = express();
 app.use('/api/products', productRoutes);
+app.use(globalErrorHandler);
 
 describe('Product Routes', () => {
   beforeEach(() => {
@@ -33,7 +35,7 @@ describe('Product Routes', () => {
       (mockPrisma.product.findUnique as any).mockResolvedValue(null);
       const res = await request(app).get('/api/products/non-existent');
       expect(res.status).toBe(404);
-      expect(res.body).toEqual({ error: 'Product not found' });
+      expect(res.body).toEqual({ status: 'error', message: 'Product not found' });
     });
 
     it('should return 200 with the product when found', async () => {
