@@ -75,6 +75,24 @@ export function globalErrorHandler(
     console.error(err.stack);
   }
 
+  // Handle Zod validation errors
+  if (err.name === 'ZodError') {
+    const zodError = err as any;
+    let message = 'Validation failed';
+    if (zodError.issues) {
+      message = 'Validation failed: ' + zodError.issues.map((e: any) => e.message).join(', ');
+    } else if (zodError.errors) {
+      message = 'Validation failed: ' + zodError.errors.map((e: any) => e.message).join(', ');
+    }
+    
+    res.status(400).json({
+      status: 'error',
+      message,
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    });
+    return;
+  }
+
   // Handle malformed JSON body from express.json()
   if ((err as any).type === 'entity.parse.failed') {
     res.status(400).json({

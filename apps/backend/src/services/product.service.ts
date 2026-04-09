@@ -15,7 +15,15 @@ export const findProducts = async (filters: { q?: string; categorySlug?: string;
   }
 
   const [data, total] = await Promise.all([
-    prisma.product.findMany({ where, skip, take: filters.limit }),
+    prisma.product.findMany({ 
+      where,
+      skip,
+      take: filters.limit,
+      include: {
+        options: { include: { values: true } },
+        variants: { include: { optionValues: { include: { optionValue: true } } } } 
+      }
+    }),
     prisma.product.count({ where })
   ]);
 
