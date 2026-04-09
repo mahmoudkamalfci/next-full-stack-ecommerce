@@ -7,4 +7,4 @@
 - **Database Operations Layer:** All database interactions must be encapsulated within specific service files located in the `services` directory. Do not perform direct database queries inside route handlers or controllers.
 - **Admin Security:** Ensure that all admin-facing routes are strictly protected by authentication and authorization middlewares.
 - **Comprehensive Testing:** Every API route must have accompanying test cases implemented using Jest and Supertest.
-
+- **Error Handling:** Always prioritize using dedicated error handlers and a global error handling middleware to manage exceptions and provide consistent error responses across the application. (errorHandler.ts)
