@@ -17,7 +17,9 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
       }
     });
   } catch (error: any) {
-    if (error.name === 'ZodError') {
+    if (error.name === 'ZodError' && error.issues) {
+      next(new BadRequestError('Validation failed: ' + error.issues.map((e: any) => e.message).join(', ')));
+    } else if (error.name === 'ZodError' && error.errors) {
       next(new BadRequestError('Validation failed: ' + error.errors.map((e: any) => e.message).join(', ')));
     } else {
       next(error);
