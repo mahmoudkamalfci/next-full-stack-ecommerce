@@ -1,6 +1,7 @@
 import SectionTitle from "@/components/section-title";
 import ProductsCarousel from "./products-carousel";
 import type { ApiProduct, ProductItem, ProductsResponse } from "@/types/product";
+import { getMinPrice, getColors } from "@/helpers/product";
 
 // ── Data fetching ──────────────────────────────────────────────────────────
 
@@ -18,23 +19,6 @@ async function getKidsProducts(): Promise<ApiProduct[]> {
     return json.data;
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-
-/** Returns the lowest variant price for a product. */
-function getMinPrice(product: ApiProduct): string {
-    if (product.variants.length === 0) return "0.00";
-    const prices = product.variants.map((v) => parseFloat(v.price));
-    return Math.min(...prices).toFixed(2);
-}
-
-/** Collects unique Color option values and maps them to CSS-friendly strings. */
-function getColors(product: ApiProduct): string[] {
-    const colorOption = product.options.find(
-        (o) => o.name.toLowerCase() === "color"
-    );
-    if (!colorOption) return [];
-    return colorOption.values.map((v) => v.value.toLowerCase());
-}
 
 // ── Component ──────────────────────────────────────────────────────────────
 
