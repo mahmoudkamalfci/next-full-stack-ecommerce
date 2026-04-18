@@ -23,7 +23,7 @@ async function main() {
 
   console.log('Seeding Users...');
   const users = await Promise.all(
-    Array.from({ length: 5 }).map(() =>
+    Array.from({ length: 100 }).map(() =>
       prisma.user.create({
         data: {
           firstName: faker.person.firstName(),
@@ -46,14 +46,26 @@ async function main() {
   );
 
   console.log('Seeding Categories...');
-  const categoriesToCreate = ['Electronics', 'Clothing', 'Home', 'Toys', 'Sports'];
+  const categoriesToCreate = [
+    { name: 'Men',         isFeatured: true  },
+    { name: 'Women',       isFeatured: true  },
+    { name: 'Kids',        isFeatured: true  },
+    { name: 'Accessories', isFeatured: true  },
+    { name: 'Sale',        isFeatured: false },
+    { name: 'New Arrivals',isFeatured: false },
+    { name: 'Shoes',       isFeatured: false },
+    { name: 'Bags',        isFeatured: false },
+    { name: 'Socks',       isFeatured: false },
+    { name: 'UniSex',      isFeatured: false },
+  ];
   const categories = await Promise.all(
-    categoriesToCreate.map((name) =>
+    categoriesToCreate.map(({ name, isFeatured }) =>
       prisma.category.create({
         data: {
           name,
           slug: faker.helpers.slugify(name).toLowerCase(),
-          description: faker.commerce.productDescription()
+          description: faker.commerce.productDescription(),
+          isFeatured,
         },
       })
     )
@@ -61,7 +73,7 @@ async function main() {
 
   console.log('Seeding Products and Variants...');
   
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 1000; i++) {
     const productName = faker.commerce.productName();
     
     // Choose random category

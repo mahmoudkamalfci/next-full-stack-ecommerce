@@ -1,99 +1,62 @@
-"use client"
-
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-    type CarouselApi,
-
-} from "@/components/ui/carousel"
-import ProductCard from "./product-card";
 import SectionTitle from "@/components/section-title";
-import { useEffect, useState } from "react";
+import ProductsCarousel from "./products-carousel";
+import type { ApiProduct, ProductItem, ProductsResponse } from "@/types/product";
 
-// Sample product data - replace with actual data from API/props
-const sampleProducts = [
-    { id: 1, name: "FlexCut Shorts", price: 690.00, image: "https://placehold.co/600x800/2D2638/white?text=FlexCut+Shorts", colors: ["#2D2638", "#1E3A8A"] },
-    { id: 2, name: "Power Leggings", price: 850.00, image: "https://placehold.co/600x800/000000/white?text=Power+Leggings", colors: ["#000000", "#4B5563"] },
-    { id: 3, name: "Active Top", price: 550.00, image: "https://placehold.co/600x800/FFFFFF/333333?text=Active+Top", colors: ["#FFFFFF", "#EF4444"] },
-    { id: 4, name: "Sport Jacket", price: 1200.00, image: "https://placehold.co/600x800/1E3A8A/white?text=Sport+Jacket", colors: ["#1E3A8A", "#10B981"] },
-    { id: 5, name: "Training Shoes", price: 1500.00, image: "https://placehold.co/600x800/111827/white?text=Training+Shoes", colors: ["#000000", "#FFFFFF"] },
-    { id: 6, name: "Yoga Mat", price: 350.00, image: "https://placehold.co/600x800/8B5CF6/white?text=Yoga+Mat", colors: ["#8B5CF6", "#EC4899"] },
-    { id: 7, name: "Gym Bag", price: 450.00, image: "https://placehold.co/600x800/374151/white?text=Gym+Bag", colors: ["#000000", "#2D2638"] },
-    { id: 8, name: "Water Bottle", price: 150.00, image: "https://placehold.co/600x800/3B82F6/white?text=Water+Bottle", colors: ["#3B82F6", "#10B981"] },
-];
+// ── Data fetching ──────────────────────────────────────────────────────────
 
-const NewCollections = () => {
-    const [api, setApi] = useState<CarouselApi>()
-    const [current, setCurrent] = useState(0)
-    const [count, setCount] = useState(0)
+async function getNewArrivals(): Promise<ApiProduct[]> {
+    const res = await fetch(
+        `${process.env.API_URL}/products?limit=10&categorySlug=new-arrivals`,
+        { next: { revalidate: 3600 } }
+    );
 
-    useEffect(() => {
-        if (!api) {
-            return
-        }
+    if (!res.ok) {
+        throw new Error(`Failed to fetch new arrivals: ${res.status}`);
+    }
 
-        setCount(api.scrollSnapList().length)
-        setCurrent(api.selectedScrollSnap() + 1)
+    const json: ProductsResponse = await res.json();
+    return json.data;
+}
 
-        api.on("select", () => {
-            setCurrent(api.selectedScrollSnap() + 1)
-        })
-    }, [api])
+// ── Helpers ────────────────────────────────────────────────────────────────
 
-    const handleQuickAdd = (productId: number) => {
-        // Handle add to cart logic here
-        // You can implement the actual logic like: addToCart(productId)
-        void productId; // Acknowledge the parameter
-    };
+/** Returns the lowest variant price for a product. */
+function getMinPrice(product: ApiProduct): string {
+    if (product.variants.length === 0) return "0.00";
+    const prices = product.variants.map((v) => parseFloat(v.price));
+    return Math.min(...prices).toFixed(2);
+}
+
+/** Collects unique Color option values and maps them to CSS-friendly strings. */
+function getColors(product: ApiProduct): string[] {
+    const colorOption = product.options.find(
+        (o) => o.name.toLowerCase() === "color"
+    );
+    if (!colorOption) return [];
+    return colorOption.values.map((v) => v.value.toLowerCase());
+}
+
+// ── Component ──────────────────────────────────────────────────────────────
+
+const NewCollections = async () => {
+    const products = await getNewArrivals();
+
+    const items: ProductItem[] = products.map((product) => ({
+        id: product.id,
+        name: product.name,
+        price: `LE ${getMinPrice(product)}`,
+        image: `https://placehold.co/600x800/2D2638/white?text=${encodeURIComponent(product.name)}`,
+        colors: getColors(product),
+    }));
 
     return (
         <section className="py-8">
             <div className="container mx-auto">
-                <SectionTitle title="Shop by Category" />
-
-                <Carousel
-                    setApi={setApi}
-                    opts={{
-                        align: "start",
-                        // loop: true,
-                    }}
-
-                >
-                    <CarouselContent className="-ml-4">
-                        {sampleProducts.map((product) => (
-                            <CarouselItem key={product.id} className="basis-1/4 pl-4 pb-4">
-                                <ProductCard
-                                    name={product.name}
-                                    price={product.price}
-                                    image={product.image}
-                                    colors={product.colors}
-                                    onQuickAdd={() => handleQuickAdd(product.id)}
-                                />
-                            </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                    <div className="flex justify-between items-center gap-8  mt-12">
-                        {/* Progress Bar */}
-                        <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-gray-900 transition-all duration-300 ease-out"
-                                style={{ width: `${((current / count) * 100)}%` }}
-                            />
-                        </div>
-                        <div className="flex justify-end items-center gap-4">
-
-                            <CarouselPrevious className="static translate-y-0 w-10 h-10" />
-                            <CarouselNext className="static translate-y-0 w-10 h-10" />
-                        </div>
-                    </div>
-                </Carousel>
-
+                <SectionTitle title="New Arrivals" />
+                <ProductsCarousel products={items} />
             </div>
         </section>
     );
-}
+};
 
 export default NewCollections;

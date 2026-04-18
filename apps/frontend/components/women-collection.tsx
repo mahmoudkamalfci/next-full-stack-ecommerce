@@ -1,99 +1,62 @@
-"use client"
-
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-    type CarouselApi,
-
-} from "@/components/ui/carousel"
-import ProductCard from "./product-card";
 import SectionTitle from "@/components/section-title";
-import { useEffect, useState } from "react";
+import ProductsCarousel from "./products-carousel";
+import type { ApiProduct, ProductItem, ProductsResponse } from "@/types/product";
 
-// Women's sports apparel products
-const sampleProducts = [
-    { id: 1, name: "Athletic Sports Bra", price: 450.00, image: "https://placehold.co/600x800/FF6B9D/white?text=Sports+Bra", colors: ["#FF6B9D", "#000000"] },
-    { id: 2, name: "Performance Leggings", price: 650.00, image: "https://placehold.co/600x800/8B4789/white?text=Leggings", colors: ["#8B4789", "#1E3A8A"] },
-    { id: 3, name: "Training Tank Top", price: 350.00, image: "https://placehold.co/600x800/4ECDC4/white?text=Tank+Top", colors: ["#4ECDC4", "#FFFFFF"] },
-    { id: 4, name: "Running Shorts", price: 400.00, image: "https://placehold.co/600x800/FF6F61/white?text=Running+Shorts", colors: ["#FF6F61", "#000000"] },
-    { id: 5, name: "Yoga Crop Top", price: 380.00, image: "https://placehold.co/600x800/95E1D3/white?text=Crop+Top", colors: ["#95E1D3", "#F38181"] },
-    { id: 6, name: "High-Waist Gym Shorts", price: 420.00, image: "https://placehold.co/600x800/AA96DA/white?text=Gym+Shorts", colors: ["#AA96DA", "#2D2638"] },
-    { id: 7, name: "Mesh Training Tee", price: 320.00, image: "https://placehold.co/600x800/FCBAD3/white?text=Training+Tee", colors: ["#FCBAD3", "#4B5563"] },
-    { id: 8, name: "Compression Capris", price: 580.00, image: "https://placehold.co/600x800/A8D8EA/white?text=Capris", colors: ["#A8D8EA", "#10B981"] },
-];
+// ── Data fetching ──────────────────────────────────────────────────────────
 
-const WomenCollection = () => {
-    const [api, setApi] = useState<CarouselApi>()
-    const [current, setCurrent] = useState(0)
-    const [count, setCount] = useState(0)
+async function getWomenProducts(): Promise<ApiProduct[]> {
+    const res = await fetch(
+        `${process.env.API_URL}/products?limit=10&categorySlug=women`,
+        { next: { revalidate: 3600 } }
+    );
 
-    useEffect(() => {
-        if (!api) {
-            return
-        }
+    if (!res.ok) {
+        throw new Error(`Failed to fetch women products: ${res.status}`);
+    }
 
-        setCount(api.scrollSnapList().length)
-        setCurrent(api.selectedScrollSnap() + 1)
+    const json: ProductsResponse = await res.json();
+    return json.data;
+}
 
-        api.on("select", () => {
-            setCurrent(api.selectedScrollSnap() + 1)
-        })
-    }, [api])
+// ── Helpers ────────────────────────────────────────────────────────────────
 
-    const handleQuickAdd = (productId: number) => {
-        // Handle add to cart logic here
-        // You can implement the actual logic like: addToCart(productId)
-        void productId; // Acknowledge the parameter
-    };
+/** Returns the lowest variant price for a product. */
+function getMinPrice(product: ApiProduct): string {
+    if (product.variants.length === 0) return "0.00";
+    const prices = product.variants.map((v) => parseFloat(v.price));
+    return Math.min(...prices).toFixed(2);
+}
+
+/** Collects unique Color option values and maps them to CSS-friendly strings. */
+function getColors(product: ApiProduct): string[] {
+    const colorOption = product.options.find(
+        (o) => o.name.toLowerCase() === "color"
+    );
+    if (!colorOption) return [];
+    return colorOption.values.map((v) => v.value.toLowerCase());
+}
+
+// ── Component ──────────────────────────────────────────────────────────────
+
+const WomenCollection = async () => {
+    const products = await getWomenProducts();
+
+    const items: ProductItem[] = products.map((product) => ({
+        id: product.id,
+        name: product.name,
+        price: `LE ${getMinPrice(product)}`,
+        image: `https://placehold.co/600x800/8B4789/white?text=${encodeURIComponent(product.name)}`,
+        colors: getColors(product),
+    }));
 
     return (
         <section className="py-8">
             <div className="container mx-auto">
                 <SectionTitle title="Women's Collection" />
-
-                <Carousel
-                    setApi={setApi}
-                    opts={{
-                        align: "start",
-                        // loop: true,
-                    }}
-
-                >
-                    <CarouselContent className="-ml-4">
-                        {sampleProducts.map((product) => (
-                            <CarouselItem key={product.id} className="basis-1/4 pl-4 pb-4">
-                                <ProductCard
-                                    name={product.name}
-                                    price={product.price}
-                                    image={product.image}
-                                    colors={product.colors}
-                                    onQuickAdd={() => handleQuickAdd(product.id)}
-                                />
-                            </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                    <div className="flex justify-between items-center gap-8  mt-12">
-                        {/* Progress Bar */}
-                        <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-gray-900 transition-all duration-300 ease-out"
-                                style={{ width: `${((current / count) * 100)}%` }}
-                            />
-                        </div>
-                        <div className="flex justify-end items-center gap-4">
-
-                            <CarouselPrevious className="static translate-y-0 w-10 h-10" />
-                            <CarouselNext className="static translate-y-0 w-10 h-10" />
-                        </div>
-                    </div>
-                </Carousel>
-
+                <ProductsCarousel products={items} />
             </div>
         </section>
     );
-}
+};
 
 export default WomenCollection;

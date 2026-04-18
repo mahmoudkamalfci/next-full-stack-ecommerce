@@ -1,7 +1,7 @@
 import express, { type Express } from 'express';
 
 import productRouter from './routes/product.routes.js';
-import { categoryRouter } from './routes/categories.js';
+import categoryRouter from './routes/category.routes.js';
 import { cartRouter } from './routes/cart.js';
 import { checkoutRouter } from './routes/checkout.js';
 import { userRouter } from './routes/user.routes.js';

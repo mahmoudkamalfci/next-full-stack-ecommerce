@@ -55,6 +55,7 @@ model Category {
   slug        String            @unique
   description String?           @db.Text
   isActive    Boolean           @default(true)
+  isFeatured  Boolean           @default(false)
   createdAt   DateTime          @default(now())
   products    ProductCategory[]
 }
