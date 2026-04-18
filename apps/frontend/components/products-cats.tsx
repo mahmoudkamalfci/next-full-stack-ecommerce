@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import SectionTitle from "./section-title";
 import CategoryCard from "./category-card";
 import type { Category, CategoriesResponse } from "@/types/category";
+import { fetchApi } from "@/helpers/api";
 
 const PLACEHOLDER_COLORS: Record<string, string> = {
     Men: "2D2638",
@@ -13,13 +14,9 @@ const PLACEHOLDER_COLORS: Record<string, string> = {
 
 // ── Data fetching ──────────────────────────────────────────────────────────
 async function getCategories(): Promise<Category[]> {
-    const res = await fetch(`${process.env.API_URL}/categories/top`, {
+    const res = await fetchApi(`/categories/top`, {
         next: { revalidate: 3600 },
     });
-
-    if (!res.ok) {
-        throw new Error(`Failed to fetch categories: ${res.status}`);
-    }
 
     const json: CategoriesResponse = await res.json();
     return json.data;

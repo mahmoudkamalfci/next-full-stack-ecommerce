@@ -2,18 +2,15 @@ import SectionTitle from "@/components/section-title";
 import ProductsCarousel from "./products-carousel";
 import type { ApiProduct, ProductItem, ProductsResponse } from "@/types/product";
 import { getMinPrice, getColors } from "@/helpers/product";
+import { fetchApi } from "@/helpers/api";
 
 // ── Data fetching ──────────────────────────────────────────────────────────
 
 async function getNewArrivals(): Promise<ApiProduct[]> {
-    const res = await fetch(
-        `${process.env.API_URL}/products?limit=10&categorySlug=new-arrivals`,
+    const res = await fetchApi(
+        `/products?limit=10&categorySlug=new-arrivals`,
         { next: { revalidate: 3600 } }
     );
-
-    if (!res.ok) {
-        throw new Error(`Failed to fetch new arrivals: ${res.status}`);
-    }
 
     const json: ProductsResponse = await res.json();
     return json.data;

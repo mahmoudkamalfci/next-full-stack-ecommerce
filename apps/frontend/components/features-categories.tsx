@@ -1,16 +1,13 @@
 import CategoryCard from "./category-card";
 import type { Category, CategoriesResponse } from "@/types/category";
 import SectionTitle from "./section-title";
+import { fetchApi } from "@/helpers/api";
 
 // ── Data fetching ──────────────────────────────────────────────────────────
 async function getFeaturedCategories(): Promise<Category[]> {
-    const res = await fetch(`${process.env.API_URL}/categories?isFeatured=true&limit=4`, {
+    const res = await fetchApi(`/categories?isFeatured=true&limit=4`, {
         next: { revalidate: 3600 },
     });
-
-    if (!res.ok) {
-        throw new Error(`Failed to fetch featured categories: ${res.status}`);
-    }
 
     const json: CategoriesResponse = await res.json();
     return json.data;
