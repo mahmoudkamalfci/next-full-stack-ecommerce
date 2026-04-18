@@ -37,7 +37,8 @@ const ProductCats = async () => {
                         return (
                             <CategoryCard
                                 key={category.id}
-                                title={category.name}
+                                slug={category.slug}
+                                name={category.name}
                                 image={`https://placehold.co/400x500/${color}/white?text=${encodeURIComponent(category.name)}`}
                                 alt={`${category.name} category`}
                                 showIcon={true}
