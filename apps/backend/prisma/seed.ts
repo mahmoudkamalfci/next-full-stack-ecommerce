@@ -10,6 +10,7 @@ async function main() {
   await prisma.cartItem.deleteMany();
   await prisma.cart.deleteMany();
   await prisma.variantOptionValue.deleteMany();
+  await prisma.productImage.deleteMany();
   await prisma.productVariant.deleteMany();
   await prisma.productOptionValue.deleteMany();
   await prisma.productOption.deleteMany();
@@ -65,6 +66,7 @@ async function main() {
           name,
           slug: faker.helpers.slugify(name).toLowerCase(),
           description: faker.commerce.productDescription(),
+          image: "https://placehold.co/600x800/2D2638/white?text=" + encodeURIComponent(name),
           isFeatured,
         },
       })
@@ -91,6 +93,24 @@ async function main() {
             }
         }
       }
+    });
+
+    // Create Product Images
+    await prisma.productImage.createMany({
+      data: [
+        {
+          productId: product.id,
+          imageUrl: "https://placehold.co/600x800/2D2638/white?text=" + encodeURIComponent(productName),
+          isPrimary: true,
+          sortOrder: 0,
+        },
+        {
+          productId: product.id,
+          imageUrl: "https://placehold.co/600x800/4B5563/white?text=" + encodeURIComponent(productName + " Alt"),
+          isPrimary: false,
+          sortOrder: 1,
+        },
+      ],
     });
 
     // Create Options: Size and Color

@@ -54,6 +54,7 @@ model Category {
   name        String
   slug        String            @unique
   description String?           @db.Text
+  image       String?
   isActive    Boolean           @default(true)
   isFeatured  Boolean           @default(false)
   createdAt   DateTime          @default(now())
@@ -70,6 +71,7 @@ model Product {
   categories  ProductCategory[]
   options     ProductOption[]
   variants    ProductVariant[]
+  images      ProductImage[]
 }
 
 model ProductCategory {
@@ -107,6 +109,18 @@ model ProductVariant {
   optionValues      VariantOptionValue[]
   cartItems         CartItem[]
   orderItems        OrderItem[]
+  images            ProductImage[]
+}
+
+model ProductImage {
+  id               Int             @id @default(autoincrement())
+  productId        Int
+  product          Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productVariantId Int?
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+  imageUrl         String
+  isPrimary        Boolean         @default(false)
+  sortOrder        Int             @default(0)
 }
 
 model VariantOptionValue {
