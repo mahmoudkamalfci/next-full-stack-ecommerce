@@ -49,4 +49,30 @@ describe('Category Routes', () => {
       expect(res.body).toEqual({ status: 'error', message: 'Internal server error' });
     });
   });
+
+  describe('GET /api/categories/:slug/filters', () => {
+    it('should return 200 with filters for a valid slug', async () => {
+      (mockPrisma.category.findUnique as any).mockResolvedValue({
+        id: 1, slug: 'men', children: [],
+      });
+      (mockPrisma.productOptionValue.findMany as any)
+        .mockResolvedValueOnce([{ value: 'S' }, { value: 'M' }])
+        .mockResolvedValueOnce([{ value: 'Red' }]);
+      (mockPrisma.productType.findMany as any).mockResolvedValue([{ name: 'T-Shirt' }]);
+
+      const res = await request(app).get('/api/categories/men/filters');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({
+        data: { sizes: ['S', 'M'], colors: ['Red'], productTypes: ['T-Shirt'] }
+      });
+    });
+
+    it('should return 404 when category slug does not exist', async () => {
+      (mockPrisma.category.findUnique as any).mockResolvedValue(null);
+      const res = await request(app).get('/api/categories/nonexistent/filters');
+      expect(res.status).toBe(404);
+      expect(res.body.message).toBe('Category not found');
+    });
+  });
 });
