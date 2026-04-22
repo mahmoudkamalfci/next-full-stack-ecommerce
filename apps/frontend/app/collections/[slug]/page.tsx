@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { ProductsSidebar } from "@/components/products-sidebar";
 import ProductCard from "@/components/product-card";
 import ProductSorting from "@/components/product-sorting";
@@ -10,13 +11,18 @@ interface CollectionPageProps {
     params: Promise<{
         slug: string;
     }>;
+    searchParams: Promise<{
+        page?: string;
+    }>;
 }
 
-export default async function CollectionPage({ params }: CollectionPageProps) {
+export default async function CollectionPage({ params, searchParams }: CollectionPageProps) {
     const { slug } = await params;
+    const resolvedSearchParams = await searchParams;
+    const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page) : 1;
 
     // Fetch products based on category slug
-    const res = await fetchApi(`/products?limit=10&categorySlug=${slug}`);
+    const res = await fetchApi(`/products?limit=10&page=${page}&categorySlug=${slug}`);
     const data: ProductsResponse = await res.json();
     const products = data.data;
 
@@ -42,26 +48,27 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                             const minPrice = getMinPrice(product);
                             const colors = getColors(product);
 
-                            // fallback image
-                            const imageUrl = "https://placehold.co/600x800/2D2638/white?text=" + encodeURIComponent(product.name);
-                            const hoveredImageUrl = "https://placehold.co/600x800/4B5563/white?text=" + encodeURIComponent(product.name + " Alt");
-
                             return (
                                 <ProductCard
                                     key={product.id}
                                     name={product.name}
                                     price={parseFloat(minPrice)}
-                                    image={imageUrl}
+                                    image={product.images[0]?.imageUrl || ""}
                                     colors={colors}
-                                    hoveredImage={hoveredImageUrl}
+                                    hoveredImage={product.images[1]?.imageUrl || ""}
                                 />
                             );
                         })}
                     </div>
 
                     <div className="mt-12 flex justify-center">
-
-                        <BasePagination />
+                        <Suspense fallback={<div className="h-10"></div>}>
+                            <BasePagination
+                                totalPages={data.pagination.totalPages}
+                                currentPage={data.pagination.page}
+                                total={data.pagination.total}
+                            />
+                        </Suspense>
                     </div>
                 </div>
             </div>

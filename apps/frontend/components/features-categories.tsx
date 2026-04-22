@@ -35,40 +35,44 @@ const FeaturesCategories = async () => {
                     {first && (
                         <div className="col-span-2 row-span-2">
                             <CategoryCard
-                                title={first.name}
-                                image={`https://placehold.co/600x800/${PLACEHOLDER_COLORS[first.name] ?? "6D28D9"}/white?text=${encodeURIComponent(first.name)}`}
+                                name={first.name}
+                                image={first.image}
                                 alt={`${first.name} category`}
                                 showIcon={false}
+                                slug={first.slug}
                             />
                         </div>
                     )}
                     {second && (
                         <div className="col-span-2 row-span-1">
                             <CategoryCard
-                                title={second.name}
-                                image={`https://placehold.co/600x400/${PLACEHOLDER_COLORS[second.name] ?? "6D28D9"}/white?text=${encodeURIComponent(second.name)}`}
+                                name={second.name}
+                                image={second.image}
                                 alt={`${second.name} category`}
                                 showIcon={false}
+                                slug={second.slug}
                             />
                         </div>
                     )}
                     {third && (
                         <div>
                             <CategoryCard
-                                title={third.name}
-                                image={`https://placehold.co/300x400/${PLACEHOLDER_COLORS[third.name] ?? "6D28D9"}/white?text=${encodeURIComponent(third.name)}`}
+                                name={third.name}
+                                image={third.image}
                                 alt={`${third.name} category`}
                                 showIcon={false}
+                                slug={third.slug}
                             />
                         </div>
                     )}
                     {fourth && (
                         <div>
                             <CategoryCard
-                                title={fourth.name}
-                                image={`https://placehold.co/300x400/${PLACEHOLDER_COLORS[fourth.name] ?? "6D28D9"}/white?text=${encodeURIComponent(fourth.name)}`}
+                                name={fourth.name}
+                                image={fourth.image}
                                 alt={`${fourth.name} category`}
                                 showIcon={false}
+                                slug={fourth.slug}
                             />
                         </div>
                     )}

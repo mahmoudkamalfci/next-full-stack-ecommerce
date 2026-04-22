@@ -7,6 +7,7 @@ export interface Category {
     isActive: boolean;
     isFeatured: boolean;
     createdAt: string;
+    image: string;
     children: Category[];
 }
 

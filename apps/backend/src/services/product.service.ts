@@ -21,7 +21,8 @@ export const findProducts = async (filters: { q?: string; categorySlug?: string;
       take: filters.limit,
       include: {
         options: { include: { values: true } },
-        variants: { include: { optionValues: { include: { optionValue: true } } } } 
+        variants: { include: { optionValues: { include: { optionValue: true } } } },
+        images: true,
       }
     }),
     prisma.product.count({ where })

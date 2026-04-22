@@ -26,7 +26,7 @@ const KidsCollection = async () => {
         id: product.id,
         name: product.name,
         price: `LE ${getMinPrice(product)}`,
-        image: `https://placehold.co/600x800/4ECDC4/white?text=${encodeURIComponent(product.name)}`,
+        image: product.images[0]?.imageUrl || '',
         colors: getColors(product),
     }));
 

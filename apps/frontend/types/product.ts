@@ -28,6 +28,15 @@ export interface ProductOption {
     values: OptionValue[];
 }
 
+export interface ProductImage {
+    id: number;
+    productId: number;
+    productVariantId: number | null;
+    imageUrl: string;
+    isPrimary: boolean;
+    sortOrder: number;
+}
+
 export interface ApiProduct {
     id: number;
     name: string;
@@ -35,6 +44,7 @@ export interface ApiProduct {
     description: string;
     isActive: boolean;
     createdAt: string;
+    images: ProductImage[];
     options: ProductOption[];
     variants: Variant[];
 }

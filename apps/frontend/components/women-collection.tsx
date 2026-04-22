@@ -26,7 +26,7 @@ const WomenCollection = async () => {
         id: product.id,
         name: product.name,
         price: `LE ${getMinPrice(product)}`,
-        image: `https://placehold.co/600x800/8B4789/white?text=${encodeURIComponent(product.name)}`,
+        image: product.images[0]?.imageUrl || '',
         colors: getColors(product),
     }));
 
