@@ -61,12 +61,20 @@ model Category {
   products    ProductCategory[]
 }
 
+model ProductType {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+}
+
 model Product {
   id          Int               @id @default(autoincrement())
   name        String
   slug        String            @unique
   description String?           @db.Text
-  isActive    Boolean           @default(true)
+  productTypeId Int?              @map("product_type_id")
+  productType   ProductType?      @relation(fields: [productTypeId], references: [id])
+  isActive      Boolean           @default(true)
   createdAt   DateTime          @default(now())
   categories  ProductCategory[]
   options     ProductOption[]

@@ -16,6 +16,7 @@ async function main() {
   await prisma.productOption.deleteMany();
   await prisma.productCategory.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.productType.deleteMany();
   await prisma.category.deleteMany();
   await prisma.address.deleteMany();
   await prisma.user.deleteMany();
@@ -73,13 +74,29 @@ async function main() {
     )
   );
 
+  console.log('Seeding Product Types...');
+  const productTypesToCreate = [
+    { name: 'T-shirt' },
+    { name: 'Hoodies' },
+    { name: 'Accessories' },
+    { name: 'pants' },
+  ];
+  const productTypes = await Promise.all(
+    productTypesToCreate.map(({ name }) =>
+      prisma.productType.create({
+        data: { name },
+      })
+    )
+  );
+
   console.log('Seeding Products and Variants...');
   
   for (let i = 0; i < 1000; i++) {
     const productName = faker.commerce.productName();
     
-    // Choose random category
+    // Choose random category and product type
     const category = faker.helpers.arrayElement(categories);
+    const productType = faker.helpers.arrayElement(productTypes);
 
     // Create the base product
     const product = await prisma.product.create({
@@ -87,6 +104,7 @@ async function main() {
         name: productName,
         slug: faker.helpers.slugify(productName + '-' + faker.string.alphanumeric(4)).toLowerCase(),
         description: faker.commerce.productDescription(),
+        productTypeId: productType.id,
         categories: {
             create: {
                 category: { connect: { id: category.id } }
