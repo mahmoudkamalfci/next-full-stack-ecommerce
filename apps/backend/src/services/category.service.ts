@@ -26,3 +26,62 @@ export const getTopCategoriesByProductCount = async () => {
     }
   });
 };
+
+export const getCategoryFilters = async (slug: string) => {
+  const category = await prisma.category.findUnique({
+    where: { slug },
+    include: { children: { select: { id: true } } },
+  });
+
+  if (!category) {
+    throw new Error('Category not found');
+  }
+
+  const categoryIds = [category.id, ...category.children.map((c: { id: number }) => c.id)];
+
+  const [sizeValues, colorValues, productTypes] = await Promise.all([
+    prisma.productOptionValue.findMany({
+      where: {
+        option: {
+          name: { equals: 'Size', mode: 'insensitive' },
+          product: {
+            isActive: true,
+            categories: { some: { categoryId: { in: categoryIds } } },
+          },
+        },
+      },
+      distinct: ['value'],
+      select: { value: true },
+    }),
+    prisma.productOptionValue.findMany({
+      where: {
+        option: {
+          name: { equals: 'Color', mode: 'insensitive' },
+          product: {
+            isActive: true,
+            categories: { some: { categoryId: { in: categoryIds } } },
+          },
+        },
+      },
+      distinct: ['value'],
+      select: { value: true },
+    }),
+    prisma.productType.findMany({
+      where: {
+        products: {
+          some: {
+            isActive: true,
+            categories: { some: { categoryId: { in: categoryIds } } },
+          },
+        },
+      },
+      select: { name: true },
+    }),
+  ]);
+
+  return {
+    sizes: sizeValues.map((v: { value: string }) => v.value),
+    colors: colorValues.map((v: { value: string }) => v.value),
+    productTypes: productTypes.map((pt: { name: string }) => pt.name),
+  };
+};

@@ -15,6 +15,12 @@ const mockPrisma: any = {
     findMany: jest.fn(),
     findUnique: jest.fn(),
   },
+  productOptionValue: {        // NEW
+    findMany: jest.fn(),
+  },
+  productType: {               // NEW
+    findMany: jest.fn(),
+  },
   cart: {
     findMany: jest.fn(),
     findUnique: jest.fn(),
