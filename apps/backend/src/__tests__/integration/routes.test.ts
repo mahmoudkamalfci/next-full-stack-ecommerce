@@ -27,17 +27,6 @@ describe('General Routes', () => {
     });
   });
 
-  // ─── GET /api/categories ────────────────────────────────────────
-
-  describe('GET /api/categories', () => {
-    it('should return 200 with categories message', async () => {
-      const res = await request(app).get('/api/categories');
-
-      expect(res.status).toBe(200);
-      expect(res.body).toEqual({ msg: 'categories' });
-    });
-  });
-
   // ─── GET /api/cart ──────────────────────────────────────────────
 
   describe('GET /api/cart', () => {

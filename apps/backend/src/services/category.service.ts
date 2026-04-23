@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js';
+import { NotFoundError } from '../middleware/errorHandler.js';
 
 export const getCategories = async (query: { isFeatured?: boolean, limit?: number }) => {
   return prisma.category.findMany({
@@ -34,7 +35,7 @@ export const getCategoryFilters = async (slug: string) => {
   });
 
   if (!category) {
-    throw new Error('Category not found');
+    throw new NotFoundError('Category not found');
   }
 
   const categoryIds = [category.id, ...category.children.map((c: { id: number }) => c.id)];
