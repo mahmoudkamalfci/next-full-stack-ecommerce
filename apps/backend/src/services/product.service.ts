@@ -1,6 +1,18 @@
 import { prisma } from '../lib/prisma.js';
 
-export const findProducts = async (filters: { q?: string; categorySlug?: string; page: number; limit: number }) => {
+interface ProductQueryFilters {
+  q?: string;
+  categorySlug?: string;
+  page: number;
+  limit: number;
+  colors?: string[];
+  sizes?: string[];
+  types?: string[];
+  maxPrice?: number;
+  minPrice?: number;
+}
+
+export const findProducts = async (filters: ProductQueryFilters) => {
   const skip = (filters.page - 1) * filters.limit;
   const where: any = { isActive: true };
   
@@ -12,6 +24,48 @@ export const findProducts = async (filters: { q?: string; categorySlug?: string;
   }
   if (filters.categorySlug) {
     where.categories = { some: { category: { slug: filters.categorySlug } } };
+  }
+
+  if (filters.colors?.length) {
+    
+    where.options = {
+      some: {
+        name: "Color",
+        values: {
+          some: {
+            id: { in: filters.colors.map(id => Number(id)) }
+          }
+        }
+      }
+    }
+  }
+
+  if (filters.sizes?.length) {
+    where.options = {
+      some: {
+        name: "Size",
+        values: {
+          some: {
+            id: { in: filters.sizes.map(id => Number(id)) }
+          }
+        }
+      }
+    }
+  }
+
+  if (filters.types?.length) {
+    where.productTypeId = { in: filters.types.map(id => Number(id)) }
+  }
+
+  if (filters.maxPrice || filters.minPrice) {
+    where.variants = {
+      some: {
+        price: {
+          gte: filters.minPrice,
+          lte: filters.maxPrice
+        }
+      }
+    }
   }
 
   const [data, total] = await Promise.all([
