@@ -8,3 +8,13 @@ export interface Product {
     size: string;
     color: string;
 }
+
+export interface CategoryFilters {
+    sizes: string[];
+    colors: string[];
+    productTypes: string[];
+}
+
+export interface CategoryFiltersResponse {
+    data: CategoryFilters;
+}
