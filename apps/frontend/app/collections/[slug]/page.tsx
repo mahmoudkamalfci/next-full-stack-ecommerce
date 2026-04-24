@@ -6,6 +6,7 @@ import BasePagination from "@/components/pagination";
 import { fetchApi } from "@/helpers/api";
 import { getMinPrice, getColors } from "@/helpers/product";
 import type { ProductsResponse } from "@/types/product";
+import type { CategoryFiltersResponse } from "@/types";
 
 interface CollectionPageProps {
     params: Promise<{
@@ -13,7 +14,17 @@ interface CollectionPageProps {
     }>;
     searchParams: Promise<{
         page?: string;
+        sizes?: string | string[];
+        colors?: string | string[];
+        types?: string | string[];
+        minPrice?: string;
+        maxPrice?: string;
     }>;
+}
+
+function toArray(val: string | string[] | undefined): string[] {
+    if (!val) return [];
+    return Array.isArray(val) ? val : [val];
 }
 
 export default async function CollectionPage({ params, searchParams }: CollectionPageProps) {
@@ -21,9 +32,28 @@ export default async function CollectionPage({ params, searchParams }: Collectio
     const resolvedSearchParams = await searchParams;
     const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page) : 1;
 
-    // Fetch products based on category slug
-    const res = await fetchApi(`/products?limit=10&page=${page}&categorySlug=${slug}`);
-    const data: ProductsResponse = await res.json();
+    const sizes  = toArray(resolvedSearchParams.sizes);
+    const colors = toArray(resolvedSearchParams.colors);
+    const types  = toArray(resolvedSearchParams.types);
+
+    // Build products query
+    const productsParams = new URLSearchParams();
+    productsParams.set('limit', '10');
+    productsParams.set('page', String(page));
+    productsParams.set('categorySlug', slug);
+    sizes.forEach(s  => productsParams.append('sizes[]', s));
+    colors.forEach(c => productsParams.append('colors[]', c));
+    types.forEach(t  => productsParams.append('types[]', t));
+    if (resolvedSearchParams.minPrice) productsParams.set('minPrice', resolvedSearchParams.minPrice);
+    if (resolvedSearchParams.maxPrice) productsParams.set('maxPrice', resolvedSearchParams.maxPrice);
+
+    const [productsRes, filtersRes] = await Promise.all([
+        fetchApi(`/products?${productsParams.toString()}`),
+        fetchApi(`/categories/${slug}/filters`),
+    ]);
+
+    const data: ProductsResponse = await productsRes.json();
+    const { data: filters }: CategoryFiltersResponse = await filtersRes.json();
     const products = data.data;
 
     return (
@@ -31,7 +61,7 @@ export default async function CollectionPage({ params, searchParams }: Collectio
             <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
                 {/* Sidebar */}
                 <div className="w-full max-w-[300px] lg:max-w-none ">
-                    <ProductsSidebar />
+                    <ProductsSidebar filters={filters} />
                 </div>
 
                 {/* Main content */}
