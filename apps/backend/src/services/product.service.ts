@@ -57,6 +57,7 @@ export const findProducts = async (filters: ProductQueryFilters) => {
   }
 
   if (filters.maxPrice || filters.minPrice) {
+    console.log(filters, 'filters')
     where.variants = {
       some: {
         price: {

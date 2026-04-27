@@ -16,7 +16,6 @@ async function getKidsProducts(): Promise<ApiProduct[]> {
     return json.data;
 }
 
-
 // ── Component ──────────────────────────────────────────────────────────────
 
 const KidsCollection = async () => {

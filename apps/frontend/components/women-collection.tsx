@@ -16,7 +16,6 @@ async function getWomenProducts(): Promise<ApiProduct[]> {
     return json.data;
 }
 
-
 // ── Component ──────────────────────────────────────────────────────────────
 
 const WomenCollection = async () => {

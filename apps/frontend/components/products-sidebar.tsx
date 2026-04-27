@@ -20,9 +20,9 @@ export const ProductsSidebar = ({ filters }: ProductsSidebarProps) => {
     const router = useRouter();
     const pathname = usePathname();
 
-    const activeSizes  = searchParams.getAll("sizes");
+    const activeSizes = searchParams.getAll("sizes");
     const activeColors = searchParams.getAll("colors");
-    const activeTypes  = searchParams.getAll("types");
+    const activeTypes = searchParams.getAll("types");
 
     const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") ?? "");
     const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") ?? "");

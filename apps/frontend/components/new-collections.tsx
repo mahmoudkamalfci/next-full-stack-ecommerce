@@ -16,7 +16,6 @@ async function getNewArrivals(): Promise<ApiProduct[]> {
     return json.data;
 }
 
-
 // ── Component ──────────────────────────────────────────────────────────────
 
 const NewCollections = async () => {

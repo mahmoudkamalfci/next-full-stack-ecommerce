@@ -32,18 +32,19 @@ export default async function CollectionPage({ params, searchParams }: Collectio
     const resolvedSearchParams = await searchParams;
     const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page) : 1;
 
-    const sizes  = toArray(resolvedSearchParams.sizes);
+    const sizes = toArray(resolvedSearchParams.sizes);
     const colors = toArray(resolvedSearchParams.colors);
-    const types  = toArray(resolvedSearchParams.types);
+    const types = toArray(resolvedSearchParams.types);
 
     // Build products query
     const productsParams = new URLSearchParams();
     productsParams.set('limit', '10');
     productsParams.set('page', String(page));
     productsParams.set('categorySlug', slug);
-    sizes.forEach(s  => productsParams.append('sizes', s));
+    sizes.forEach(s => productsParams.append('sizes', s));
     colors.forEach(c => productsParams.append('colors', c));
-    types.forEach(t  => productsParams.append('types', t));
+
+    types.forEach(t => productsParams.append('types', t));
     if (resolvedSearchParams.minPrice) productsParams.set('minPrice', resolvedSearchParams.minPrice);
     if (resolvedSearchParams.maxPrice) productsParams.set('maxPrice', resolvedSearchParams.maxPrice);
 

@@ -14,7 +14,6 @@ export default function ProductPage() {
         "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?w=800&q=80",
     ];
 
-
     return (
         <div className="container mx-auto px-4 py-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-24">
