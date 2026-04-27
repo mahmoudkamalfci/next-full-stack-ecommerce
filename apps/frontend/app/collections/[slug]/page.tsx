@@ -41,9 +41,9 @@ export default async function CollectionPage({ params, searchParams }: Collectio
     productsParams.set('limit', '10');
     productsParams.set('page', String(page));
     productsParams.set('categorySlug', slug);
-    sizes.forEach(s  => productsParams.append('sizes[]', s));
-    colors.forEach(c => productsParams.append('colors[]', c));
-    types.forEach(t  => productsParams.append('types[]', t));
+    sizes.forEach(s  => productsParams.append('sizes', s));
+    colors.forEach(c => productsParams.append('colors', c));
+    types.forEach(t  => productsParams.append('types', t));
     if (resolvedSearchParams.minPrice) productsParams.set('minPrice', resolvedSearchParams.minPrice);
     if (resolvedSearchParams.maxPrice) productsParams.set('maxPrice', resolvedSearchParams.maxPrice);
 

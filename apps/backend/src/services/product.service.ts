@@ -27,34 +27,33 @@ export const findProducts = async (filters: ProductQueryFilters) => {
   }
 
   if (filters.colors?.length) {
-    
     where.options = {
       some: {
-        name: "Color",
+        name: { equals: 'Color', mode: 'insensitive' },
         values: {
           some: {
-            id: { in: filters.colors.map(id => Number(id)) }
+            value: { in: filters.colors }
           }
         }
       }
-    }
+    };
   }
 
   if (filters.sizes?.length) {
     where.options = {
       some: {
-        name: "Size",
+        name: { equals: 'Size', mode: 'insensitive' },
         values: {
           some: {
-            id: { in: filters.sizes.map(id => Number(id)) }
+            value: { in: filters.sizes }
           }
         }
       }
-    }
+    };
   }
 
   if (filters.types?.length) {
-    where.productTypeId = { in: filters.types.map(id => Number(id)) }
+    where.productType = { name: { in: filters.types } };
   }
 
   if (filters.maxPrice || filters.minPrice) {

@@ -10,6 +10,7 @@ import FeaturesCategoriesSkeleton from "@/components/features-categories-skeleto
 import KidsCollection from "@/components/kides-collections";
 
 export default function Home() {
+  console.log("Home page");
   return (
     <div>
       <Hero47
