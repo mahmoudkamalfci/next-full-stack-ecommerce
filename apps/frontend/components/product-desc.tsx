@@ -6,7 +6,11 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 
-export function ProductDetails() {
+interface ProductDetailsProps {
+    description: string;
+}
+
+export function ProductDetails({ description }: ProductDetailsProps) {
     return (
         <div className="bg-slate-50 rounded-2xl p-8 lg:p-12 mt-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -16,17 +20,7 @@ export function ProductDetails() {
                     <h2 className="text-3xl md:text-4xl font-bold mb-6">PowerLite Training Tee</h2>
 
                     <div className=" space-y-6 leading-relaxed">
-                        <p>
-                            Designed for performance and everyday comfort, the Magma PowerLite Training Tee is crafted to keep up
-                            with your active lifestyle. Made from lightweight, breathable fabric, it delivers excellent airflow and moisture
-                            control to keep you cool and dry. The clean athletic cut with contrast side panels offers a modern, sporty
-                            look—perfect for workouts, training sessions, or casual wear.
-                        </p>
-                        <p>
-                            &nbsp;is crafted to keep up with your active lifestyle. Made from lightweight, breathable fabric, it delivers
-                            excellent airflow and moisture control to keep you cool and dry. The clean athletic cut with contrast side
-                            panels offers a modern, sporty look—perfect for workouts, training sessions, or casual wear.
-                        </p>
+                        <p>{description}</p>
                     </div>
                 </div>
 
