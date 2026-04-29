@@ -63,6 +63,7 @@ export interface ProductsResponse {
 export interface ProductItem {
     id: number;
     name: string;
+    href: string;
     price: string;
     image: string;
     colors: string[];

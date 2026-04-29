@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
 import {
@@ -26,6 +26,12 @@ export const ProductsSidebar = ({ filters }: ProductsSidebarProps) => {
 
     const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") ?? "");
     const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") ?? "");
+
+    // reset min and max price if user clear searchParams
+    useEffect(() => {
+        if (!searchParams.get("minPrice")) setMinPrice("");
+        if (!searchParams.get("maxPrice")) setMaxPrice("");
+    }, [searchParams]);
 
     function toggleParam(key: string, value: string, current: string[]) {
         const params = new URLSearchParams(searchParams.toString());

@@ -56,17 +56,41 @@ export const findProducts = async (filters: ProductQueryFilters) => {
     where.productType = { name: { in: filters.types } };
   }
 
-  if (filters.maxPrice || filters.minPrice) {
-    console.log(filters, 'filters')
-    where.variants = {
-      some: {
-        price: {
-          gte: filters.minPrice,
-          lte: filters.maxPrice
+  if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+    if (!where.AND) where.AND = [];
+    
+    if (filters.minPrice !== undefined) {
+      where.AND.push({
+        variants: {
+          every: {
+            price: {
+              gte: filters.minPrice
+            }
+          }
         }
-      }
+      });
+      where.AND.push({
+        variants: {
+          some: {}
+        }
+      });
+    }
+
+    if (filters.maxPrice !== undefined) {
+      where.AND.push({
+        variants: {
+          some: {
+            price: {
+              lte: filters.maxPrice
+            }
+          }
+        }
+      });
     }
   }
+
+  console.log(where, 'where')
+
 
   const [data, total] = await Promise.all([
     prisma.product.findMany({ 
@@ -91,7 +115,9 @@ export const getProductBySlug = async (slug: string) => {
     include: {
       categories: { include: { category: true } },
       options: { include: { values: true } },
-      variants: { include: { optionValues: { include: { optionValue: true } } } }
+      variants: { include: { optionValues: { include: { optionValue: true } } } },
+      images: true,
+      productType: true,
     }
   });
   return product;

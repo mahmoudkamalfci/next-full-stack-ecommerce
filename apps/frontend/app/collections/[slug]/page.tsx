@@ -3,6 +3,7 @@ import { ProductsSidebar } from "@/components/products-sidebar";
 import ProductCard from "@/components/product-card";
 import ProductSorting from "@/components/product-sorting";
 import BasePagination from "@/components/pagination";
+import { ActiveFilters } from "@/components/active-filters";
 import { fetchApi } from "@/helpers/api";
 import { getMinPrice, getColors } from "@/helpers/product";
 import type { ProductsResponse } from "@/types/product";
@@ -62,7 +63,9 @@ export default async function CollectionPage({ params, searchParams }: Collectio
             <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
                 {/* Sidebar */}
                 <div className="w-full max-w-[300px] lg:max-w-none ">
-                    <ProductsSidebar filters={filters} />
+                    <Suspense fallback={<p>Loading filters...</p>}>
+                        <ProductsSidebar filters={filters} />
+                    </Suspense>
                 </div>
 
                 {/* Main content */}
@@ -73,6 +76,10 @@ export default async function CollectionPage({ params, searchParams }: Collectio
                         </h1>
                         <ProductSorting />
                     </div>
+                    <Suspense fallback={<p>Loading filters...</p>}>
+                        <ActiveFilters categorySlug={slug} />
+                    </Suspense>
+
                     {/* Products grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {products.map((product) => {
@@ -84,6 +91,7 @@ export default async function CollectionPage({ params, searchParams }: Collectio
                                     key={product.id}
                                     name={product.name}
                                     price={parseFloat(minPrice)}
+                                    href={`/collections/${slug}/${product.slug}`}
                                     image={product.images[0]?.imageUrl || ""}
                                     colors={colors}
                                     hoveredImage={product.images[1]?.imageUrl || ""}

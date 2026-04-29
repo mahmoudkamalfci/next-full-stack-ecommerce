@@ -50,6 +50,7 @@ const ProductsCarousel = ({ products }: ProductsCarouselProps) => {
                         <ProductCard
                             name={product.name}
                             price={product.price}
+                            href={product.href}
                             image={product.image}
                             colors={product.colors}
                             onQuickAdd={() => handleQuickAdd(product.id)}

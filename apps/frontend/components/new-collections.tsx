@@ -24,6 +24,7 @@ const NewCollections = async () => {
     const items: ProductItem[] = products.map((product) => ({
         id: product.id,
         name: product.name,
+        href: `/collections/new-arrivals/${product.slug}`,
         price: `LE ${getMinPrice(product)}`,
         image: product.images[0]?.imageUrl || '',
         colors: getColors(product),
