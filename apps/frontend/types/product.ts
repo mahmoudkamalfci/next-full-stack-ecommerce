@@ -23,7 +23,6 @@ export interface Variant {
 
 export interface ProductOption {
     id: number;
-    productId: number;
     name: string;
     values: OptionValue[];
 }

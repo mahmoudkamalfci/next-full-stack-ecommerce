@@ -8,16 +8,17 @@ import {
 
 interface ProductDetailsProps {
     description: string;
+    name: string;
 }
 
-export function ProductDetails({ description }: ProductDetailsProps) {
+export function ProductDetails({ description, name }: ProductDetailsProps) {
     return (
         <div className="bg-slate-50 rounded-2xl p-8 lg:p-12 mt-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Left Column: Description */}
                 <div>
                     <h3 className="text-sm font-semibold uppercase tracking-wide mb-3">Description</h3>
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6">PowerLite Training Tee</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-6">{name}</h2>
 
                     <div className=" space-y-6 leading-relaxed">
                         <p>{description}</p>

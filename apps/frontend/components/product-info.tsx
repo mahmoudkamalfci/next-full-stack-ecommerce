@@ -16,12 +16,24 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
     const sizeOption = product.options.find(o => o.name === 'Size' || o.name === 'Sizes');
     const sizes = sizeOption?.values || [];
-    
+
     const colorOption = product.options.find(o => o.name === 'Color' || o.name === 'Colors');
     const colors = colorOption?.values || [];
 
-    const [selectedSize, setSelectedSize] = useState(sizes[0]?.value || "");
-    const [selectedColor, setSelectedColor] = useState(colors[0]?.value || "");
+    const isVariantSizeAvailable = (color: string, size: string) => {
+        const variant = product.variants.find(v => {
+            const hasSize = sizes.length === 0 || v.optionValues.some(ov => ov.optionValue.value === size);
+            const hasColor = colors.length === 0 || v.optionValues.some(ov => ov.optionValue.value === color);
+            return hasSize && hasColor;
+        });
+        return (variant?.inventoryQuantity ?? 0) > 0;
+    }
+
+    const defaultColor = colors[0]?.value || "";
+    const defaultSize = sizes.find(s => isVariantSizeAvailable(defaultColor, s.value))?.value || sizes[0]?.value || "";
+
+    const [selectedColor, setSelectedColor] = useState(defaultColor);
+    const [selectedSize, setSelectedSize] = useState(defaultSize);
     const [selectedQuantity, setSelectedQuantity] = useState(1);
 
     const selectedVariant = useMemo(() => {
@@ -34,6 +46,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
     const price = selectedVariant?.price || "0.00";
     const sku = selectedVariant?.sku || "";
+    const inventoryQuantity = selectedVariant?.inventoryQuantity || 0;
 
     const handleAddToCart = () => {
         addItem({
@@ -67,15 +80,38 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 <div>
                     <p className="font-semibold mb-2">Size: {selectedSize}</p>
                     <div className="flex flex-wrap gap-2">
-                        {sizes.map((size) => (
-                            <Button 
-                                key={size.id}
-                                variant="outline"
-                                className={clsx("rounded-full", selectedSize === size.value && "border-black")}
-                                onClick={() => setSelectedSize(size.value)}>
-                                {size.value}
-                            </Button>
-                        ))}
+                        {sizes.map((size) => {
+                            const isAvailable = isVariantSizeAvailable(selectedColor, size.value);
+                            return (
+                                <div key={size.id} className="relative inline-flex">
+                                    <Button
+                                        variant="outline"
+                                        className={clsx("rounded-full", selectedSize === size.value && "border-black")}
+                                        disabled={!isAvailable}
+                                        onClick={() => setSelectedSize(size.value)}>
+                                        {size.value}
+                                    </Button>
+                                    {!isAvailable && (
+                                        <svg
+                                            className="absolute inset-0 w-full h-full pointer-events-none"
+                                            viewBox="0 0 100 100"
+                                            preserveAspectRatio="none"
+                                        >
+                                            <line
+                                                x1="15"
+                                                y1="85"
+                                                x2="85"
+                                                y2="15"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                                strokeLinecap="round"
+                                                className="text-gray-300"
+                                            />
+                                        </svg>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -111,6 +147,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
                         className="px-3 py-1 bg-white hover:bg-gray-100"
                         onClick={() => setSelectedQuantity(selectedQuantity + 1)}>+</button>
                 </div>
+
+                {/* show error if current variant quantity exceeds inventoryQuantity */}
+                {selectedQuantity > inventoryQuantity && (
+                    <p className="text-red-500">Quantity exceeds inventory quantity</p>
+                )}
             </div>
 
             <div className="flex gap-4 mt-4">

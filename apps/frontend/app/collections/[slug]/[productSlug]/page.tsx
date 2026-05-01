@@ -14,9 +14,9 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
     const { productSlug } = await params;
-    
+
     const res = await fetchApi(`/products/${productSlug}`);
-    
+
     if (!res.ok) {
         if (res.status === 404) notFound();
         throw new Error("Failed to fetch product");
@@ -37,7 +37,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
 
             <div>
-                <ProductDetails description={product.description || ""} />
+                <ProductDetails description={product.description || ""} name={product.name} />
             </div>
         </div>
     )
