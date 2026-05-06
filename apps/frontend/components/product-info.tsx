@@ -6,13 +6,14 @@ import { AddToCartDrawer } from "@/components/add-to-cart-drawer";
 import { clsx } from "clsx";
 import { useCartStore } from "@/stores/useCartStore";
 import type { ApiProduct } from "@/types/product";
+import { Minus, Plus } from "lucide-react";
 
 interface ProductInfoProps {
     product: ApiProduct;
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
-    const { addItem } = useCartStore();
+    const addItem = useCartStore((state) => state.addItem);
 
     const sizeOption = product.options.find(o => o.name === 'Size' || o.name === 'Sizes');
     const sizes = sizeOption?.values || [];
@@ -141,11 +142,15 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     <button
                         disabled={selectedQuantity === 1}
                         className="px-3 py-1 bg-white hover:bg-gray-100"
-                        onClick={() => setSelectedQuantity(selectedQuantity > 1 ? selectedQuantity - 1 : selectedQuantity)}> - </button>
-                    <span className="px-3 py-1 border-x">{selectedQuantity}</span>
+                        onClick={() => setSelectedQuantity(selectedQuantity > 1 ? selectedQuantity - 1 : selectedQuantity)}>
+                        <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="px-3 py-1">{selectedQuantity}</span>
                     <button
                         className="px-3 py-1 bg-white hover:bg-gray-100"
-                        onClick={() => setSelectedQuantity(selectedQuantity + 1)}>+</button>
+                        onClick={() => setSelectedQuantity(selectedQuantity + 1)}>
+                        <Plus className="w-3 h-3" />
+                    </button>
                 </div>
 
                 {/* show error if current variant quantity exceeds inventoryQuantity */}
@@ -155,12 +160,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             </div>
 
             <div className="flex gap-4 mt-4">
-                <AddToCartDrawer
-                    productImage={product.images[0]?.imageUrl || ""}
-                    productTitle={product.name}
-                    productPrice={`LE ${price}`}
-                    variantText={`${selectedColor} ${selectedColor && selectedSize ? '/' : ''} ${selectedSize}`.trim()}
-                >
+                <AddToCartDrawer>
                     <Button
                         variant="secondary"
                         className="flex-1 rounded-full py-6 w-full"

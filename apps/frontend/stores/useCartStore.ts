@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { Product } from '../types'
+import { CartProduct } from '../types'
 
 interface CartState {
-  items: Product[]
+  items: CartProduct[]
   totalPrice: number
-  addItem: (product: Product) => void
+  addItem: (product: CartProduct) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
@@ -18,13 +18,17 @@ export const useCartStore = create<CartState>()(
       totalPrice: 0,
 
       // Action: Add Item
-      addItem: (product: Product) => {
+      addItem: (product: CartProduct) => {
+        console.log("product",product);
+        
         const currentItems = get().items;
-        const existingItem = currentItems.find((item: Product) => item.id === product.id);
+        console.log("currentItems",currentItems);
+
+        const existingItem = currentItems.find((item: CartProduct) => item.id === product.id);
 
         if (existingItem) {
           // If item exists, increase quantity
-          const updatedItems = currentItems.map((item: Product) =>
+          const updatedItems = currentItems.map((item: CartProduct) =>
             item.id === product.id
               ? { ...item, quantity: item.quantity + (product.quantity || 1) }
               : item
@@ -38,13 +42,13 @@ export const useCartStore = create<CartState>()(
 
       // Action: Remove Item
       removeItem: (id: string) => {
-        set({ items: get().items.filter((item: Product) => item.id !== id) });
+        set({ items: get().items.filter((item: CartProduct) => item.id !== id) });
       },
 
       // Action: Update Quantity
       updateQuantity: (id: string, quantity: number) => {
         set({
-          items: get().items.map((item: Product) =>
+          items: get().items.map((item: CartProduct) =>
             item.id === id ? { ...item, quantity: Math.max(0, quantity) } : item
           ),
         });
@@ -56,7 +60,7 @@ export const useCartStore = create<CartState>()(
     {
       name: 'cart-storage', // unique name for localStorage key
       storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
-      skipHydration: true, // IMPORTANT for Next.js (see below)
+      // skipHydration: true, // IMPORTANT for Next.js (see below)
     }
   )
 )
