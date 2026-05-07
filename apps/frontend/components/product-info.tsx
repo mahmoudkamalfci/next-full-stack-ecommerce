@@ -163,13 +163,13 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 <AddToCartDrawer>
                     <Button
                         variant="secondary"
-                        className="flex-1 rounded-full py-6 w-full"
+                        className="flex-1 rounded-full py-6 w-full cursor-pointer"
                         onClick={handleAddToCart}
                     >
                         Add to cart
                     </Button>
                 </AddToCartDrawer>
-                <Button variant="default" className="flex-1 rounded-full py-6">Buy it now</Button>
+                <Button variant="default" className="flex-1 rounded-full py-6 cursor-pointer">Buy it now</Button>
             </div>
         </div>
     )

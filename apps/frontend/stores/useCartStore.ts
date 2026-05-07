@@ -19,11 +19,8 @@ export const useCartStore = create<CartState>()(
 
       // Action: Add Item
       addItem: (product: CartProduct) => {
-        console.log("product",product);
-        
         const currentItems = get().items;
-        console.log("currentItems",currentItems);
-
+        
         const existingItem = currentItems.find((item: CartProduct) => item.id === product.id);
 
         if (existingItem) {
