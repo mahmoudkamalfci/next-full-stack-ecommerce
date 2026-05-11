@@ -16,10 +16,14 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 
 export const signUpSchema = z
   .object({
-    name: z
+    firstName: z
       .string()
-      .nonempty("Name is required")
-      .min(2, "Name must be at least 2 characters long"),
+      .nonempty("First name is required")
+      .min(2, "First name must be at least 2 characters long"),
+    lastName: z
+      .string()
+      .nonempty("Last name is required")
+      .min(2, "Last name must be at least 2 characters long"),
     phone: z
       .string()
       .nonempty("Phone number is required")

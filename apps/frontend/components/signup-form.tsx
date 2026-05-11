@@ -3,18 +3,26 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import Link from "next/link"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signUpSchema, type SignUpFormData } from "@/lib/validations"
+import { Eye, EyeOff } from "lucide-react"
+import { signUpAction } from "@/actions/auth"
+import { useRouter } from "next/navigation"
 
 export function SignUpForm({
     className,
 }: React.ComponentPropsWithoutRef<"form">) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const router = useRouter()
 
     const {
         register,
@@ -27,12 +35,23 @@ export function SignUpForm({
 
     const onSubmit = async (data: SignUpFormData) => {
         setIsSubmitting(true)
+        setErrorMessage(null)
+        setSuccessMessage(null)
+        
         try {
-            // TODO: Implement actual signup logic with your backend
-            console.log("SignUp data:", data)
-            setSuccessMessage("Account created successfully!")
-        } catch {
-            console.error("SignUp failed")
+            const result = await signUpAction(data)
+            
+            if (result.success) {
+                setSuccessMessage("Account created successfully! Redirecting...")
+                // Redirect to login or home after a short delay
+                setTimeout(() => {
+                    router.push("/login")
+                }, 2000)
+            } else {
+                setErrorMessage(result.error || "Signup failed")
+            }
+        } catch (error) {
+            setErrorMessage("An unexpected error occurred. Please try again.")
         } finally {
             setIsSubmitting(false)
         }
@@ -58,74 +77,113 @@ export function SignUpForm({
                 </div>
             )}
 
+            {errorMessage && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                    {errorMessage}
+                </div>
+            )}
+
             <div className="grid gap-6">
-                <div className="grid gap-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                        id="name"
-                        type="text"
-                        placeholder="John Doe"
-                        className={errors.name ? "border-red-500" : ""}
-                        {...register("name")}
-                    />
-                    {errors.name && (
-                        <p className="text-sm text-red-500">{errors.name.message}</p>
-                    )}
+                <div className="grid grid-cols-2 gap-4">
+                    <Field>
+                        <FieldLabel htmlFor="firstName">First Name</FieldLabel>
+                        <Input
+                            id="firstName"
+                            type="text"
+                            placeholder="John"
+                            aria-invalid={!!errors.firstName}
+                            {...register("firstName")}
+                        />
+                        <FieldError errors={[errors.firstName]} />
+                    </Field>
+                    <Field>
+                        <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
+                        <Input
+                            id="lastName"
+                            type="text"
+                            placeholder="Doe"
+                            aria-invalid={!!errors.lastName}
+                            {...register("lastName")}
+                        />
+                        <FieldError errors={[errors.lastName]} />
+                    </Field>
                 </div>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="phone">Phone Number</Label>
+                <Field>
+                    <FieldLabel htmlFor="phone">Phone Number</FieldLabel>
                     <Input
                         id="phone"
                         type="tel"
-                        placeholder="+1 (555) 123-4567"
-                        className={errors.phone ? "border-red-500" : ""}
+                        placeholder="+201004022469"
+                        aria-invalid={!!errors.phone}
                         {...register("phone")}
                     />
-                    {errors.phone && (
-                        <p className="text-sm text-red-500">{errors.phone.message}</p>
-                    )}
-                </div>
+                    <FieldError errors={[errors.phone]} />
+                </Field>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
+                <Field>
+                    <FieldLabel htmlFor="email">Email</FieldLabel>
                     <Input
                         id="email"
                         type="email"
                         placeholder="m@example.com"
-                        className={errors.email ? "border-red-500" : ""}
+                        aria-invalid={!!errors.email}
                         {...register("email")}
                     />
-                    {errors.email && (
-                        <p className="text-sm text-red-500">{errors.email.message}</p>
-                    )}
-                </div>
+                    <FieldError errors={[errors.email]} />
+                </Field>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                        id="password"
-                        type="password"
-                        className={errors.password ? "border-red-500" : ""}
-                        {...register("password")}
-                    />
-                    {errors.password && (
-                        <p className="text-sm text-red-500">{errors.password.message}</p>
-                    )}
-                </div>
+                <Field>
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <InputGroup>
+                        <InputGroupInput
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            aria-invalid={!!errors.password}
+                            {...register("password")}
+                        />
+                        <InputGroupAddon align="inline-end">
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="text-muted-foreground hover:text-foreground focus:outline-none"
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
+                        </InputGroupAddon>
+                    </InputGroup>
+                    <FieldError errors={[errors.password]} />
+                </Field>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                        id="confirmPassword"
-                        type="password"
-                        className={errors.confirmPassword ? "border-red-500" : ""}
-                        {...register("confirmPassword")}
-                    />
-                    {errors.confirmPassword && (
-                        <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
-                    )}
-                </div>
+                <Field>
+                    <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
+                    <InputGroup>
+                        <InputGroupInput
+                            id="confirmPassword"
+                            type={showConfirmPassword ? "text" : "password"}
+                            aria-invalid={!!errors.confirmPassword}
+                            {...register("confirmPassword")}
+                        />
+                        <InputGroupAddon align="inline-end">
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="text-muted-foreground hover:text-foreground focus:outline-none"
+                            >
+                                {showConfirmPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
+                        </InputGroupAddon>
+                    </InputGroup>
+                    <FieldError errors={[errors.confirmPassword]} />
+                </Field>
 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? "Creating account..." : "Sign Up"}

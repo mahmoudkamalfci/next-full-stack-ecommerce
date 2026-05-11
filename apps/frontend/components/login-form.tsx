@@ -3,18 +3,25 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
+import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginSchema, type LoginFormData } from "@/lib/validations"
+import { loginAction } from "@/actions/auth"
+import { useRouter } from "next/navigation"
 
 export function LoginForm({
     className,
 }: React.ComponentPropsWithoutRef<"form">) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const [showPassword, setShowPassword] = useState(false)
+    const router = useRouter()
 
     const {
         register,
@@ -27,12 +34,23 @@ export function LoginForm({
 
     const onSubmit = async (data: LoginFormData) => {
         setIsSubmitting(true)
+        setErrorMessage(null)
+        setSuccessMessage(null)
+
         try {
-            // TODO: Implement actual login logic with your backend
-            console.log("Login data:", data)
-            setSuccessMessage("Login successful!")
-        } catch {
-            console.error("Login failed")
+            const result = await loginAction(data)
+            
+            if (result.success) {
+                setSuccessMessage("Login successful! Redirecting...")
+                // In a real app, you'd store the token in cookies here
+                setTimeout(() => {
+                    router.push("/")
+                }, 1500)
+            } else {
+                setErrorMessage(result.error || "Invalid email or password")
+            }
+        } catch (error) {
+            setErrorMessage("An unexpected error occurred. Please try again.")
         } finally {
             setIsSubmitting(false)
         }
@@ -47,9 +65,7 @@ export function LoginForm({
         >
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Login to your account</h1>
-                <p className="text-balance text-sm text-muted-foreground">
-                    Enter your email below to login to your account
-                </p>
+
             </div>
 
             {successMessage && (
@@ -58,24 +74,27 @@ export function LoginForm({
                 </div>
             )}
 
+            {errorMessage && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                    {errorMessage}
+                </div>
+            )}
+
             <div className="grid gap-6">
-                <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
+                <Field>
+                    <FieldLabel htmlFor="email">Email</FieldLabel>
                     <Input
                         id="email"
                         type="email"
                         placeholder="m@example.com"
-                        className={errors.email ? "border-red-500" : ""}
+                        aria-invalid={!!errors.email}
                         {...register("email")}
                     />
-                    {errors.email && (
-                        <p className="text-sm text-red-500">{errors.email.message}</p>
-                    )}
-                </div>
-                <div className="grid gap-2">
+                    <FieldError errors={[errors.email]} />
+                </Field>
+                <Field>
                     <div className="flex items-center">
-                        <Label htmlFor="password">Password</Label>
-
+                        <FieldLabel htmlFor="password">Password</FieldLabel>
                         <Link
                             href="/forgot-password"
                             className="ml-auto text-sm underline-offset-4 hover:underline"
@@ -83,16 +102,29 @@ export function LoginForm({
                             Forgot your password?
                         </Link>
                     </div>
-                    <Input
-                        id="password"
-                        type="password"
-                        className={errors.password ? "border-red-500" : ""}
-                        {...register("password")}
-                    />
-                    {errors.password && (
-                        <p className="text-sm text-red-500">{errors.password.message}</p>
-                    )}
-                </div>
+                    <InputGroup>
+                        <InputGroupInput
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            aria-invalid={!!errors.password}
+                            {...register("password")}
+                        />
+                        <InputGroupAddon align="inline-end">
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="text-muted-foreground hover:text-foreground focus:outline-none"
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
+                        </InputGroupAddon>
+                    </InputGroup>
+                    <FieldError errors={[errors.password]} />
+                </Field>
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? "Signing in..." : "Login"}
                 </Button>
