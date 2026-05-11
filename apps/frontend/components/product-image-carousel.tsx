@@ -18,8 +18,10 @@ import {
 } from "@/components/ui/dialog"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
+import type { ProductImage } from "@/types/product"
+
 interface ProductImageCarouselProps {
-    images: string[]
+    images: ProductImage[]
 }
 
 export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
@@ -80,7 +82,7 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                                     onClick={() => onThumbClick(index)}
                                 >
                                     <Image
-                                        src={image}
+                                        src={image.imageUrl}
                                         alt={`Product thumbnail ${index + 1}`}
                                         fill
                                         className="object-cover"
@@ -114,7 +116,7 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                                     onClick={() => onThumbClick(index)}
                                 >
                                     <Image
-                                        src={image}
+                                        src={image.imageUrl}
                                         alt={`Product thumbnail ${index + 1}`}
                                         fill
                                         className="object-cover"
@@ -134,7 +136,7 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                             <CarouselItem key={index}>
                                 <div className="relative aspect-3/4 w-full h-full">
                                     <Image
-                                        src={image}
+                                        src={image.imageUrl}
                                         alt={`Product image ${index + 1}`}
                                         fill
                                         className="object-cover"
@@ -168,7 +170,7 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                         <div className="relative w-full h-[90vh] flex items-center justify-center">
                             {images[current] && (
                                 <Image
-                                    src={images[current]}
+                                    src={images[current].imageUrl}
                                     alt={`Product image full view`}
                                     fill
                                     className="object-contain"

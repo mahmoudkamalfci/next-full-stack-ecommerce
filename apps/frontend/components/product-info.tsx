@@ -1,86 +1,140 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AddToCartDrawer } from "@/components/add-to-cart-drawer";
 import { clsx } from "clsx";
 import { useCartStore } from "@/stores/useCartStore";
+import type { ApiProduct } from "@/types/product";
+import { Minus, Plus } from "lucide-react";
 
 interface ProductInfoProps {
-    images: string[];
+    product: ApiProduct;
 }
 
-export function ProductInfo({ images }: ProductInfoProps) {
-    const { addItem } = useCartStore();
-    const [selectedSize, setSelectedSize] = useState("XS/S")
-    const [selectedColor, setSelectedColor] = useState("Burgundy")
-    const [selectedQuantity, setSelectedQuantity] = useState(1)
+export function ProductInfo({ product }: ProductInfoProps) {
+    const addItem = useCartStore((state) => state.addItem);
+
+    const sizeOption = product.options.find(o => o.name === 'Size' || o.name === 'Sizes');
+    const sizes = sizeOption?.values || [];
+
+    const colorOption = product.options.find(o => o.name === 'Color' || o.name === 'Colors');
+    const colors = colorOption?.values || [];
+
+    const isVariantSizeAvailable = (color: string, size: string) => {
+        const variant = product.variants.find(v => {
+            const hasSize = sizes.length === 0 || v.optionValues.some(ov => ov.optionValue.value === size);
+            const hasColor = colors.length === 0 || v.optionValues.some(ov => ov.optionValue.value === color);
+            return hasSize && hasColor;
+        });
+        return (variant?.inventoryQuantity ?? 0) > 0;
+    }
+
+    const defaultColor = colors[0]?.value || "";
+    const defaultSize = sizes.find(s => isVariantSizeAvailable(defaultColor, s.value))?.value || sizes[0]?.value || "";
+
+    const [selectedColor, setSelectedColor] = useState(defaultColor);
+    const [selectedSize, setSelectedSize] = useState(defaultSize);
+    const [selectedQuantity, setSelectedQuantity] = useState(1);
+
+    const selectedVariant = useMemo(() => {
+        return product.variants.find(v => {
+            const hasSize = sizes.length === 0 || v.optionValues.some(ov => ov.optionValue.value === selectedSize);
+            const hasColor = colors.length === 0 || v.optionValues.some(ov => ov.optionValue.value === selectedColor);
+            return hasSize && hasColor;
+        });
+    }, [product.variants, sizes.length, colors.length, selectedSize, selectedColor]);
+
+    const price = selectedVariant?.price || "0.00";
+    const sku = selectedVariant?.sku || "";
+    const inventoryQuantity = selectedVariant?.inventoryQuantity || 0;
 
     const handleAddToCart = () => {
         addItem({
-            id: `core-joggers-${selectedSize}-${selectedColor}`,
-            sku: `UMJR-174-2411-${selectedSize}-${selectedColor.substring(0, 3).toUpperCase()}`,
-            name: "Core Joggers",
-            price: 699,
-            image: images[0] || "",
+            id: selectedVariant ? selectedVariant.id.toString() : product.id.toString(),
+            sku: sku,
+            name: product.name,
+            price: parseFloat(price),
+            image: product.images[0]?.imageUrl || "",
             quantity: selectedQuantity,
             size: selectedSize,
             color: selectedColor
         })
     }
 
+    const getColorClass = (colorName: string) => {
+        const name = colorName.toLowerCase();
+        if (name === 'burgundy') return 'bg-red-900';
+        if (name === 'black') return 'bg-black';
+        if (name === 'white') return 'bg-white';
+        if (name === 'red') return 'bg-red-700';
+        return 'bg-gray-500'; // fallback
+    };
+
     return (
         <div className="flex flex-col gap-4">
-            <h1 className="text-3xl font-bold">Core Joggers</h1>
-            <p className="text-gray-500 text-sm">SKU: UMJR-174-2411-{selectedSize}-{selectedColor === "Burgundy" ? "BRG" : selectedColor.substring(0, 3).toUpperCase()}</p>
-            <p className="text-xl font-semibold">LE 699.00</p>
+            <h1 className="text-3xl font-bold">{product.name}</h1>
+            <p className="text-gray-500 text-sm">SKU: {sku}</p>
+            <p className="text-xl font-semibold">LE {price}</p>
 
-            <div>
-                <p className="font-semibold mb-2">Size: {selectedSize}</p>
-                <div className="flex gap-2">
-                    <Button variant="outline"
-                        className={clsx("rounded-full", selectedSize === "XS/S" && "border-black")}
-                        onClick={() => setSelectedSize("XS/S")}>
-                        XS/S
-                    </Button>
-                    <Button variant="outline"
-                        className={clsx("rounded-full", selectedSize === "M/L" && "border-black")}
-                        onClick={() => setSelectedSize("M/L")}>
-                        M/L
-                    </Button>
-                    <Button variant="outline"
-                        className={clsx("rounded-full", selectedSize === "XL/2XL" && "border-black")}
-                        onClick={() => setSelectedSize("XL/2XL")}>
-                        XL/2XL
-                    </Button>
+            {sizes.length > 0 && (
+                <div>
+                    <p className="font-semibold mb-2">Size: {selectedSize}</p>
+                    <div className="flex flex-wrap gap-2">
+                        {sizes.map((size) => {
+                            const isAvailable = isVariantSizeAvailable(selectedColor, size.value);
+                            return (
+                                <div key={size.id} className="relative inline-flex">
+                                    <Button
+                                        variant="outline"
+                                        className={clsx("rounded-full", selectedSize === size.value && "border-black")}
+                                        disabled={!isAvailable}
+                                        onClick={() => setSelectedSize(size.value)}>
+                                        {size.value}
+                                    </Button>
+                                    {!isAvailable && (
+                                        <svg
+                                            className="absolute inset-0 w-full h-full pointer-events-none"
+                                            viewBox="0 0 100 100"
+                                            preserveAspectRatio="none"
+                                        >
+                                            <line
+                                                x1="15"
+                                                y1="85"
+                                                x2="85"
+                                                y2="15"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                                strokeLinecap="round"
+                                                className="text-gray-300"
+                                            />
+                                        </svg>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            )}
 
-            <div>
-                <p className="font-semibold mb-2">Color: {selectedColor}</p>
-                <div className="flex gap-2">
-                    <button
-                        className={clsx("w-8 h-8 rounded-full bg-red-900 border-2 border-white ",
-                            selectedColor === "Burgundy" && "ring-2 ring-black")}
-                        onClick={() => setSelectedColor("Burgundy")}>
-                    </button>
-                    <button
-                        className={clsx("w-8 h-8 rounded-full bg-black border-2 border-white ",
-                            selectedColor === "Black" && "ring-2 ring-black")}
-                        onClick={() => setSelectedColor("Black")}>
-                    </button>
-                    <button
-                        className={clsx("w-8 h-8 rounded-full bg-white border-2 border-gray-200 ",
-                            selectedColor === "White" && "ring-2 ring-black")}
-                        onClick={() => setSelectedColor("White")}>
-                    </button>
-                    <button
-                        className={clsx("w-8 h-8 rounded-full bg-red-700 border-2 border-white ",
-                            selectedColor === "Red" && "ring-2 ring-black")}
-                        onClick={() => setSelectedColor("Red")}>
-                    </button>
+            {colors.length > 0 && (
+                <div>
+                    <p className="font-semibold mb-2">Color: {selectedColor}</p>
+                    <div className="flex flex-wrap gap-2">
+                        {colors.map((color) => (
+                            <button
+                                key={color.id}
+                                className={clsx(
+                                    "w-8 h-8 rounded-full border-2 border-gray-200",
+                                    getColorClass(color.value),
+                                    selectedColor === color.value && "ring-2 ring-black"
+                                )}
+                                onClick={() => setSelectedColor(color.value)}>
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div>
                 <p className="font-semibold mb-2">Quantity:</p>
@@ -88,30 +142,34 @@ export function ProductInfo({ images }: ProductInfoProps) {
                     <button
                         disabled={selectedQuantity === 1}
                         className="px-3 py-1 bg-white hover:bg-gray-100"
-                        onClick={() => setSelectedQuantity(selectedQuantity > 1 ? selectedQuantity - 1 : selectedQuantity)}> - </button>
-                    <span className="px-3 py-1 border-x">{selectedQuantity}</span>
+                        onClick={() => setSelectedQuantity(selectedQuantity > 1 ? selectedQuantity - 1 : selectedQuantity)}>
+                        <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="px-3 py-1">{selectedQuantity}</span>
                     <button
                         className="px-3 py-1 bg-white hover:bg-gray-100"
-                        onClick={() => setSelectedQuantity(selectedQuantity + 1)}>+</button>
+                        onClick={() => setSelectedQuantity(selectedQuantity + 1)}>
+                        <Plus className="w-3 h-3" />
+                    </button>
                 </div>
+
+                {/* show error if current variant quantity exceeds inventoryQuantity */}
+                {selectedQuantity > inventoryQuantity && (
+                    <p className="text-red-500">Quantity exceeds inventory quantity</p>
+                )}
             </div>
 
             <div className="flex gap-4 mt-4">
-                <AddToCartDrawer
-                    productImage={images[0] || ""}
-                    productTitle="Core Joggers"
-                    productPrice="LE 699.00"
-                    variantText={`${selectedColor} / ${selectedSize}`}
-                >
+                <AddToCartDrawer>
                     <Button
                         variant="secondary"
-                        className="flex-1 rounded-full py-6 w-full"
+                        className="flex-1 rounded-full py-6 w-full cursor-pointer"
                         onClick={handleAddToCart}
                     >
                         Add to cart
                     </Button>
                 </AddToCartDrawer>
-                <Button variant="default" className="flex-1 rounded-full py-6">Buy it now</Button>
+                <Button variant="default" className="flex-1 rounded-full py-6 cursor-pointer">Buy it now</Button>
             </div>
         </div>
     )

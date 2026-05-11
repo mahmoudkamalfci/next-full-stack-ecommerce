@@ -4,7 +4,6 @@ import CategoryCard from "./category-card";
 import type { Category, CategoriesResponse } from "@/types/category";
 import { fetchApi } from "@/helpers/api";
 
-
 // ── Data fetching ──────────────────────────────────────────────────────────
 async function getCategories(): Promise<Category[]> {
     const res = await fetchApi(`/categories/top`, {

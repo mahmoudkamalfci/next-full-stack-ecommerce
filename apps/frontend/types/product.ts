@@ -23,7 +23,6 @@ export interface Variant {
 
 export interface ProductOption {
     id: number;
-    productId: number;
     name: string;
     values: OptionValue[];
 }
@@ -63,6 +62,7 @@ export interface ProductsResponse {
 export interface ProductItem {
     id: number;
     name: string;
+    href: string;
     price: string;
     image: string;
     colors: string[];

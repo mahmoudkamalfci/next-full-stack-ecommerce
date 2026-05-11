@@ -6,8 +6,9 @@ import { NotFoundError } from '../middleware/errorHandler.js';
 export const getProducts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validatedQuery = getProductsQuerySchema.parse(req.query);
+    console.log(validatedQuery, 'validatedQuery')
     const result = await ProductService.findProducts(validatedQuery);
-    
+
     res.status(200).json({
       data: result.data,
       pagination: {

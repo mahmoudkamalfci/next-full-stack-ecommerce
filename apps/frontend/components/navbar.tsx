@@ -14,6 +14,7 @@ import {
     NavigationMenuTrigger,
     navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
+import { AddToCartDrawer } from "./add-to-cart-drawer";
 
 interface ProductCategory {
     title: string;
@@ -282,7 +283,11 @@ const Navbar = () => {
                             <User />
                         </Button>
                         <Button size="icon" variant="ghost">
-                            <ShoppingCart />
+                            <AddToCartDrawer>
+                                <Button className="cursor-pointer" size="icon" variant="ghost">
+                                    <ShoppingCart />
+                                </Button>
+                            </AddToCartDrawer>
                         </Button>
                     </div>
                 </div>
