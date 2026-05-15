@@ -7,7 +7,7 @@ import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginSchema, type LoginFormData } from "@/lib/validations"
@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation"
 export function LoginForm({
     className,
 }: React.ComponentPropsWithoutRef<"form">) {
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isPending, startTransition] = useTransition()
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [showPassword, setShowPassword] = useState(false)
@@ -32,28 +32,26 @@ export function LoginForm({
         mode: "onBlur",
     })
 
-    const onSubmit = async (data: LoginFormData) => {
-        setIsSubmitting(true)
+    const onSubmit = (data: LoginFormData) => {
         setErrorMessage(null)
         setSuccessMessage(null)
 
-        try {
-            const result = await loginAction(data)
-            
-            if (result.success) {
-                setSuccessMessage("Login successful! Redirecting...")
-                // In a real app, you'd store the token in cookies here
-                setTimeout(() => {
-                    router.push("/")
-                }, 1500)
-            } else {
-                setErrorMessage(result.error || "Invalid email or password")
+        startTransition(async () => {
+            try {
+                const result = await loginAction(data)
+                
+                if (result.success) {
+                    setSuccessMessage("Login successful! Redirecting...")
+                    setTimeout(() => {
+                        router.push("/")
+                    }, 1500)
+                } else {
+                    setErrorMessage(result.error || "Invalid email or password")
+                }
+            } catch (error) {
+                setErrorMessage("An unexpected error occurred. Please try again.")
             }
-        } catch (error) {
-            setErrorMessage("An unexpected error occurred. Please try again.")
-        } finally {
-            setIsSubmitting(false)
-        }
+        })
     }
 
     return (
@@ -125,8 +123,8 @@ export function LoginForm({
                     </InputGroup>
                     <FieldError errors={[errors.password]} />
                 </Field>
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Signing in..." : "Login"}
+                <Button type="submit" className="w-full" disabled={isPending}>
+                    {isPending ? "Signing in..." : "Login"}
                 </Button>
 
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">

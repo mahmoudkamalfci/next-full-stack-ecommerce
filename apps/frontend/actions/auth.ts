@@ -1,16 +1,13 @@
 "use server"
 
-import { SignUpFormData } from "@/lib/validations"
+import { LoginFormData, SignUpFormData } from "@/lib/validations"
+import { fetchApi } from "../helpers/api"
+import { cookies } from "next/headers"
 
 export async function signUpAction(data: SignUpFormData) {
-  const apiUrl = process.env.API_URL || "http://localhost:4000/api"
-  
   try {
-    const response = await fetch(`${apiUrl}/users/register`, {
+    const response = await fetchApi("/users/register", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
         email: data.email,
         password: data.password,
@@ -21,13 +18,6 @@ export async function signUpAction(data: SignUpFormData) {
 
     const result = await response.json()
 
-    if (!response.ok) {
-      return {
-        success: false,
-        error: result.message || "Something went wrong during registration.",
-      }
-    }
-
     return {
       success: true,
       data: result,
@@ -36,30 +26,29 @@ export async function signUpAction(data: SignUpFormData) {
     console.error("Signup error:", error)
     return {
       success: false,
-      error: "Failed to connect to the server. Please try again later.",
+      error: error instanceof Error ? error.message : "Failed to connect to the server. Please try again later.",
     }
   }
 }
 
-export async function loginAction(data: any) {
-  const apiUrl = process.env.API_URL || "http://localhost:4000/api"
-
+export async function loginAction(data: LoginFormData) {
   try {
-    const response = await fetch(`${apiUrl}/users/login`, {
+    const response = await fetchApi("/users/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(data),
     })
 
     const result = await response.json()
 
-    if (!response.ok) {
-      return {
-        success: false,
-        error: result.message || "Invalid email or password.",
-      }
+    if (result.token) {
+      const cookieStore = await cookies()
+      cookieStore.set("token", result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+      })
     }
 
     return {
@@ -70,7 +59,7 @@ export async function loginAction(data: any) {
     console.error("Login error:", error)
     return {
       success: false,
-      error: "Failed to connect to the server. Please try again later.",
+      error: error instanceof Error ? error.message : "Failed to connect to the server. Please try again later.",
     }
   }
 }

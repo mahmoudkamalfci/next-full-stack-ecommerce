@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signUpSchema, type SignUpFormData } from "@/lib/validations"
@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation"
 export function SignUpForm({
     className,
 }: React.ComponentPropsWithoutRef<"form">) {
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isPending, startTransition] = useTransition()
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [showPassword, setShowPassword] = useState(false)
@@ -33,28 +33,27 @@ export function SignUpForm({
         mode: "onBlur",
     })
 
-    const onSubmit = async (data: SignUpFormData) => {
-        setIsSubmitting(true)
+    const onSubmit = (data: SignUpFormData) => {
         setErrorMessage(null)
         setSuccessMessage(null)
         
-        try {
-            const result = await signUpAction(data)
-            
-            if (result.success) {
-                setSuccessMessage("Account created successfully! Redirecting...")
-                // Redirect to login or home after a short delay
-                setTimeout(() => {
-                    router.push("/login")
-                }, 2000)
-            } else {
-                setErrorMessage(result.error || "Signup failed")
+        startTransition(async () => {
+            try {
+                const result = await signUpAction(data)
+                
+                if (result.success) {
+                    setSuccessMessage("Account created successfully! Redirecting...")
+                    // Redirect to login or home after a short delay
+                    setTimeout(() => {
+                        router.push("/login")
+                    }, 2000)
+                } else {
+                    setErrorMessage(result.error || "Signup failed")
+                }
+            } catch (error) {
+                setErrorMessage("An unexpected error occurred. Please try again.")
             }
-        } catch (error) {
-            setErrorMessage("An unexpected error occurred. Please try again.")
-        } finally {
-            setIsSubmitting(false)
-        }
+        })
     }
 
     return (
@@ -185,8 +184,8 @@ export function SignUpForm({
                     <FieldError errors={[errors.confirmPassword]} />
                 </Field>
 
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Creating account..." : "Sign Up"}
+                <Button type="submit" className="w-full" disabled={isPending}>
+                    {isPending ? "Creating account..." : "Sign Up"}
                 </Button>
 
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
