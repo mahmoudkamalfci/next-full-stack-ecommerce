@@ -56,7 +56,7 @@ export const useCartStore = create<CartState>()(
       clearCart: () => set({ items: [] }),
 
       // Action: Set Cart From API
-      setCartFromApi: (items: CartProduct[]) => set({ items }),
+      setCartFromApi: (items: CartProduct[]) => set({ items: Array.isArray(items) ? items : [] }),
     }),
     {
       name: 'cart-storage', // unique name for localStorage key

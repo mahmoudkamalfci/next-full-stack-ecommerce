@@ -1,4 +1,5 @@
 import redisClient from '../lib/redis.js';
+import { prisma } from '../lib/prisma.js';
 
 export const addCartItem = async (userId: string, productId: string, quantity: number) => {
   const key = `cart:${userId}`;
@@ -9,8 +10,57 @@ export const addCartItem = async (userId: string, productId: string, quantity: n
 export const getCart = async (userId: string) => {
   const key = `cart:${userId}`;
   const rawCart = await redisClient.hGetAll(key);
-  // Optional: join with Postgres for pricing
-  return rawCart;
+  
+  const variantIds = Object.keys(rawCart).map(Number).filter(id => !isNaN(id));
+  if (variantIds.length === 0) return [];
+
+  const variants = await prisma.productVariant.findMany({
+    where: { id: { in: variantIds } },
+    include: {
+      product: {
+        include: {
+          images: true
+        }
+      },
+      optionValues: {
+        include: {
+          optionValue: {
+            include: {
+              option: true
+            }
+          }
+        }
+      },
+      images: true
+    }
+  });
+
+  const items = variants.map(variant => {
+    const quantity = parseInt(rawCart[variant.id.toString()] || '1');
+    const image = variant.images[0]?.imageUrl || variant.product.images[0]?.imageUrl || '';
+    
+    let size = '';
+    let color = '';
+    
+    variant.optionValues.forEach(ov => {
+      const name = ov.optionValue.option.name.toLowerCase();
+      if (name.includes('size')) size = ov.optionValue.value;
+      if (name.includes('color')) color = ov.optionValue.value;
+    });
+
+    return {
+      id: variant.id.toString(),
+      sku: variant.sku,
+      name: variant.product.name,
+      price: Number(variant.price),
+      image,
+      quantity,
+      size,
+      color
+    };
+  });
+
+  return items;
 };
 
 export const mergeCart = async (userId: string, guestItems: { productId: string, quantity: number }[]) => {

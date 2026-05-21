@@ -30,8 +30,15 @@ app.use(globalErrorHandler);
 // Only start listening when this file is run directly (not imported by tests)
 const port = process.env.PORT || 4000;
 
+import redisClient from './lib/redis.js';
+
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  redisClient.connect().then(() => {
+    console.log('Connected to Redis');
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  }).catch((err) => {
+    console.error('Failed to connect to Redis', err);
   });
 }

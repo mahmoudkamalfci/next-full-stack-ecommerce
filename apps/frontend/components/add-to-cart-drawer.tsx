@@ -27,13 +27,14 @@ export function AddToCartDrawer({
     const [showOrderNote, setShowOrderNote] = React.useState(false)
 
     // Get store state
-    const cartItems = useCartStore((state) => state.items)
+    const rawCartItems = useCartStore((state) => state.items)
+    const cartItems = Array.isArray(rawCartItems) ? rawCartItems : []
     const removeItem = useCartStore((state) => state.removeItem)
     const updateQuantity = useCartStore((state) => state.updateQuantity)
 
     // Calculate total
-    const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
-    const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0)
+    const subtotal = cartItems.reduce((acc, item) => acc + ((item?.price || 0) * (item?.quantity || 1)), 0)
+    const totalItems = cartItems.reduce((acc, item) => acc + (item?.quantity || 1), 0)
 
     return (
         <Drawer direction="right">
