@@ -282,13 +282,11 @@ const Navbar = () => {
                         <Button size="icon" variant="ghost">
                             <User />
                         </Button>
-                        <Button size="icon" variant="ghost">
-                            <AddToCartDrawer>
-                                <Button className="cursor-pointer" size="icon" variant="ghost">
-                                    <ShoppingCart />
-                                </Button>
-                            </AddToCartDrawer>
-                        </Button>
+                        <AddToCartDrawer>
+                            <Button className="cursor-pointer" size="icon" variant="ghost">
+                                <ShoppingCart />
+                            </Button>
+                        </AddToCartDrawer>
                     </div>
                 </div>
             </div>
