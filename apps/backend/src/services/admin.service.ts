@@ -4,14 +4,14 @@ import { NotFoundError } from '../middleware/errorHandler.js';
 export class AdminService {
   static async getAllUsers() {
     return prisma.user.findMany({
-      select: { id: true, email: true, firstName: true, lastName: true, role: true, createdAt: true, updatedAt: true }
+      select: { id: true, email: true, firstName: true, lastName: true, role: true, createdAt: true }
     });
   }
 
   static async getUserById(id: string) {
     const user = await prisma.user.findUnique({
       where: { id: parseInt(id, 10) },
-      select: { id: true, email: true, firstName: true, lastName: true, role: true, createdAt: true, updatedAt: true }
+      select: { id: true, email: true, firstName: true, lastName: true, role: true, createdAt: true }
     });
     if (!user) throw new NotFoundError('User not found');
     return user;
