@@ -5,16 +5,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { forgotPasswordSchema, type ForgotPasswordFormData } from "@/lib/validations"
+import { forgotPasswordAction } from "@/actions/auth"
 
 export function ForgotPasswordForm({
     className,
 }: React.ComponentPropsWithoutRef<"form">) {
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isPending, startTransition] = useTransition()
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
     const {
         register,
@@ -25,17 +27,23 @@ export function ForgotPasswordForm({
         mode: "onBlur",
     })
 
-    const onSubmit = async (data: ForgotPasswordFormData) => {
-        setIsSubmitting(true)
-        try {
-            // TODO: Implement actual forgot password logic with your backend
-            console.log("Forgot password data:", data)
-            setSuccessMessage("Password reset link sent! Check your email.")
-        } catch {
-            console.error("Forgot password failed")
-        } finally {
-            setIsSubmitting(false)
-        }
+    const onSubmit = (data: ForgotPasswordFormData) => {
+        setErrorMessage(null)
+        setSuccessMessage(null)
+
+        startTransition(async () => {
+            try {
+                const result = await forgotPasswordAction(data)
+                
+                if (result.success) {
+                    setSuccessMessage(result.data?.message || "Password reset link sent! Check your email.")
+                } else {
+                    setErrorMessage(result.error || "Failed to send reset link")
+                }
+            } catch (error) {
+                setErrorMessage("An unexpected error occurred. Please try again.")
+            }
+        })
     }
 
     return (
@@ -58,6 +66,12 @@ export function ForgotPasswordForm({
                 </div>
             )}
 
+            {errorMessage && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                    {errorMessage}
+                </div>
+            )}
+
             <div className="grid gap-6">
                 <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -73,8 +87,8 @@ export function ForgotPasswordForm({
                     )}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Sending..." : "Send Reset Link"}
+                <Button type="submit" className="w-full" disabled={isPending}>
+                    {isPending ? "Sending..." : "Send Reset Link"}
                 </Button>
             </div>
 
