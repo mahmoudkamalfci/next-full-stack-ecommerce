@@ -9,6 +9,7 @@ interface CartState {
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
+  setCartFromApi: (items: CartProduct[]) => void
 }
 
 export const useCartStore = create<CartState>()(
@@ -53,6 +54,9 @@ export const useCartStore = create<CartState>()(
       
       // Action: Clear Cart
       clearCart: () => set({ items: [] }),
+
+      // Action: Set Cart From API
+      setCartFromApi: (items: CartProduct[]) => set({ items }),
     }),
     {
       name: 'cart-storage', // unique name for localStorage key
