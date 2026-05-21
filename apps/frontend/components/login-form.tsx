@@ -12,7 +12,9 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginSchema, type LoginFormData } from "@/lib/validations"
 import { loginAction } from "@/actions/auth"
+import { mergeCartAction } from "@/actions/cart"
 import { useRouter } from "next/navigation"
+import { useCartStore } from "@/stores/useCartStore"
 
 export function LoginForm({
     className,
@@ -41,6 +43,18 @@ export function LoginForm({
                 const result = await loginAction(data)
                 
                 if (result.success) {
+                    const items = useCartStore.getState().items;
+                    if (items.length > 0) {
+                        try {
+                            const mergedCart = await mergeCartAction(items.map(item => ({ productId: item.id, quantity: item.quantity })));
+                            if (mergedCart) {
+                                useCartStore.getState().setCartFromApi(mergedCart);
+                            }
+                        } catch (err) {
+                            console.error("Cart merge failed", err);
+                        }
+                    }
+
                     setSuccessMessage("Login successful! Redirecting...")
                     setTimeout(() => {
                         router.push("/")

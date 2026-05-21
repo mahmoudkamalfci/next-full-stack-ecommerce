@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { CartProduct } from '../types'
 
-interface CartState {
+export interface CartState {
   items: CartProduct[]
   totalPrice: number
   addItem: (product: CartProduct) => void

@@ -47,9 +47,25 @@ describe('Product Routes', () => {
       expect(mockPrisma.product.findUnique).toHaveBeenCalledWith({
         where: { slug: 'test-product', isActive: true },
         include: {
-          categories: { include: { category: true } },
-          options: { include: { values: true } },
-          variants: { include: { optionValues: { include: { optionValue: true } } } }
+          categories: { select: { category: { select: { id: true, name: true, slug: true } } } },
+          options: { select: { name: true, values: { select: { id: true, value: true } } } },
+          variants: {
+            select: {
+               id: true, 
+               sku: true, 
+               price: true, 
+               inventoryQuantity: true, 
+               optionValues: { 
+                select: {
+                   optionValue: {  
+                    select: { id: true, value: true } 
+                  } 
+                }
+              }
+            }
+          },
+          images: {select: {imageUrl: true}},
+          productType: {select: {name: true}},
         }
       });
     });

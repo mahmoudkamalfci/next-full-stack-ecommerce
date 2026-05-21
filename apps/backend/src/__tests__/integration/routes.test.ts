@@ -30,11 +30,10 @@ describe('General Routes', () => {
   // ─── GET /api/cart ──────────────────────────────────────────────
 
   describe('GET /api/cart', () => {
-    it('should return 200 with cart message', async () => {
+    it('should return 401 without auth token', async () => {
       const res = await request(app).get('/api/cart');
 
-      expect(res.status).toBe(200);
-      expect(res.body).toEqual({ msg: 'cart' });
+      expect(res.status).toBe(401);
     });
   });
 
