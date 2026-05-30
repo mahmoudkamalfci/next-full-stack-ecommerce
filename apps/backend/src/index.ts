@@ -7,6 +7,7 @@ import { checkoutRouter } from './routes/checkout.js';
 import { userRouter } from './routes/user.routes.js';
 import { adminRouter } from './routes/admin.routes.js';
 import { notFoundHandler, globalErrorHandler } from './middleware/errorHandler.js';
+import redisClient from './lib/redis.js';
 
 export const app: Express = express();
 
@@ -30,7 +31,6 @@ app.use(globalErrorHandler);
 // Only start listening when this file is run directly (not imported by tests)
 const port = process.env.PORT || 4000;
 
-import redisClient from './lib/redis.js';
 
 if (process.env.NODE_ENV !== 'test') {
   redisClient.connect().then(() => {
