@@ -2,7 +2,7 @@ import express, { type Express } from 'express';
 
 import productRouter from './routes/product.routes.js';
 import categoryRouter from './routes/category.routes.js';
-import { cartRouter } from './routes/cart.js';
+import { cartRouter } from './routes/cart.routes.js';
 import { checkoutRouter } from './routes/checkout.js';
 import { userRouter } from './routes/user.routes.js';
 import { adminRouter } from './routes/admin.routes.js';

@@ -16,6 +16,7 @@ import Link from "next/link"
 import { Textarea } from "./ui/textarea"
 import { Label } from "./ui/label"
 import { useCartStore } from "@/stores/useCartStore"
+import { updateCartItemQuantityAction, removeCartItemAction } from "@/actions/cart"
 
 export interface AddToCartDrawerProps {
     children: React.ReactNode
@@ -31,6 +32,16 @@ export function AddToCartDrawer({
     const cartItems = Array.isArray(rawCartItems) ? rawCartItems : []
     const removeItem = useCartStore((state) => state.removeItem)
     const updateQuantity = useCartStore((state) => state.updateQuantity)
+
+    const handleUpdateQuantity = (id: string, quantity: number) => {
+        updateQuantity(id, quantity);
+        updateCartItemQuantityAction(id, quantity).catch(e => console.error("Sync failed", e));
+    }
+
+    const handleRemoveItem = (id: string) => {
+        removeItem(id);
+        removeCartItemAction(id).catch(e => console.error("Sync failed", e));
+    }
 
     // Calculate total
     const subtotal = cartItems.reduce((acc, item) => acc + ((item?.price || 0) * (item?.quantity || 1)), 0)
@@ -94,7 +105,7 @@ export function AddToCartDrawer({
                                                 <div className="flex items-center border rounded-md h-8">
                                                     <button
                                                         className="px-2 text-gray-500 hover:text-black transition-colors"
-                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                                                         disabled={item.quantity <= 1}
                                                     >
                                                         <Minus className="w-3 h-3" />
@@ -102,13 +113,13 @@ export function AddToCartDrawer({
                                                     <span className="text-xs font-medium w-6 text-center">{item.quantity}</span>
                                                     <button
                                                         className="px-2 text-gray-500 hover:text-black transition-colors"
-                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                                                     >
                                                         <Plus className="w-3 h-3" />
                                                     </button>
                                                 </div>
                                                 <button
-                                                    onClick={() => removeItem(item.id)}
+                                                    onClick={() => handleRemoveItem(item.id)}
                                                     className="text-xs text-gray-500 underline decoration-gray-300 hover:text-red-500 transition-colors"
                                                 >
                                                     Remove

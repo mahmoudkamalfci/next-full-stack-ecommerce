@@ -70,3 +70,26 @@ export const mergeCart = async (userId: string, guestItems: { productId: string,
   }
   return getCart(userId);
 };
+
+export const updateCartItem = async (userId: string, productId: string, quantity: number) => {
+  const key = `cart:${userId}`;
+  if (quantity <= 0) {
+    await redisClient.hDel(key, productId);
+  } else {
+    await redisClient.hSet(key, productId, quantity);
+  }
+  return getCart(userId);
+};
+
+export const removeCartItem = async (userId: string, productId: string) => {
+  const key = `cart:${userId}`;
+  await redisClient.hDel(key, productId);
+  return getCart(userId);
+};
+
+export const clearCart = async (userId: string) => {
+  const key = `cart:${userId}`;
+  await redisClient.del(key);
+  return [];
+};
+

@@ -41,12 +41,14 @@ export function LoginForm({
         startTransition(async () => {
             try {
                 const result = await loginAction(data)
-                
+
                 if (result.success) {
                     const items = useCartStore.getState().items;
+                    console.log("items", items)
                     if (items.length > 0) {
                         try {
                             const mergedCart = await mergeCartAction(items.map(item => ({ productId: item.id, quantity: item.quantity })));
+                            console.log("mergedCart", mergedCart)
                             if (mergedCart) {
                                 useCartStore.getState().setCartFromApi(mergedCart);
                             }

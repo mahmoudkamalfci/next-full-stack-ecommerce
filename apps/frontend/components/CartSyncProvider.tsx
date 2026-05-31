@@ -6,11 +6,13 @@ import { syncCartAction } from "../actions/cart";
 
 export function CartSyncProvider({ children, isAuthenticated }: { children: ReactNode, isAuthenticated: boolean }) {
   const setCartFromApi = useCartStore(state => state.setCartFromApi);
-  
+
   useEffect(() => {
+
     if (isAuthenticated) {
       syncCartAction().then(data => {
-        if (data) {
+
+        if (data && Array.isArray(data)) {
           setCartFromApi(data);
         }
       });
