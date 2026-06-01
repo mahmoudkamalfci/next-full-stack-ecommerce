@@ -18,6 +18,10 @@ const mockPrisma: any = {
   productOptionValue: {        // NEW
     findMany: jest.fn(),
   },
+  productVariant: {
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+  },
   productType: {               // NEW
     findMany: jest.fn(),
   },
