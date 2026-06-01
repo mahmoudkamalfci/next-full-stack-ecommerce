@@ -26,7 +26,7 @@ export async function fetchApi(endpoint: string, options?: RequestInit): Promise
                 httpOnly: false, // Must be accessible to client-side JS
                 maxAge: 10,      // Automatically expires in 10 seconds
             });
-        } catch (e) {
+        } catch {
             // Fail silently if cookies cannot be modified (e.g. during render)
         }
     }
@@ -38,7 +38,7 @@ export async function fetchApi(endpoint: string, options?: RequestInit): Promise
             if (errorData.message) {
                 errorMessage = errorData.message;
             }
-        } catch (e) {
+        } catch {
             // Fallback to default generic error if JSON parsing fails
         }
         throw new Error(errorMessage);
