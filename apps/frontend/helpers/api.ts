@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 /**
  * Custom fetch wrapper for API calls that automatically prepends the API_URL
  * and centralizes error handling.
@@ -14,6 +16,20 @@ export async function fetchApi(endpoint: string, options?: RequestInit): Promise
     };
 
     const res = await fetch(url, finalOptions);
+
+    if (res.status === 401) {
+        try {
+            const cookieStore = await cookies();
+            cookieStore.delete("token");
+            cookieStore.set("session_expired", "true", {
+                path: "/",
+                httpOnly: false, // Must be accessible to client-side JS
+                maxAge: 10,      // Automatically expires in 10 seconds
+            });
+        } catch (e) {
+            // Fail silently if cookies cannot be modified (e.g. during render)
+        }
+    }
 
     if (!res.ok) {
         let errorMessage = `API fetch failed: ${res.status} ${res.statusText} for ${url}`;
