@@ -21,19 +21,28 @@ export async function syncCartAction() {
 }
 
 export async function mergeCartAction(guestItems: { productId: string, quantity: number }[]) {
+  console.log("mergeCartAction started on server with items:", guestItems);
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
-    if (!token) return null;
+    console.log("mergeCartAction token:", token);
+    if (!token) {
+      console.log("mergeCartAction: No token found, returning null");
+      return null;
+    }
 
+    console.log("mergeCartAction: Sending request to backend /cart/merge");
     const response = await fetchApi("/cart/merge", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify({ guestItems }),
     });
-    return await response.json();
+    console.log("mergeCartAction: Backend response status:", response.status);
+    const data = await response.json();
+    console.log("mergeCartAction: Backend response data:", data);
+    return data;
   } catch (error) {
-    console.error("Cart merge error:", error);
+    console.error("Cart merge error inside Server Action:", error);
     return null;
   }
 }

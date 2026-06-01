@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import * as cartService from '../services/cart.service.js';
 
 export const addItem = async (req: Request, res: Response) => {
@@ -14,11 +14,16 @@ export const getCart = async (req: Request, res: Response) => {
   res.json(cart);
 };
 
-export const mergeCart = async (req: Request, res: Response) => {
-  const { guestItems } = req.body;
-  const userId = (req as any).user.id;
-  const cart = await cartService.mergeCart(userId, guestItems);
-  res.json(cart);
+export const mergeCart = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { guestItems } = req.body;
+    const userId = (req as any).user.id;
+    const cart = await cartService.mergeCart(userId, guestItems);
+    res.json(cart);
+  } catch (error: any) {
+    next(error);
+  }
+
 };
 
 export const updateItem = async (req: Request, res: Response) => {

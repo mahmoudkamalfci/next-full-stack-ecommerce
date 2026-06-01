@@ -44,9 +44,10 @@ export function LoginForm({
 
                 if (result.success) {
                     const items = useCartStore.getState().items;
-                    console.log("items", items)
                     if (items.length > 0) {
                         try {
+                            console.log("items", items)
+
                             const mergedCart = await mergeCartAction(items.map(item => ({ productId: item.id, quantity: item.quantity })));
                             console.log("mergedCart", mergedCart)
                             if (mergedCart) {
