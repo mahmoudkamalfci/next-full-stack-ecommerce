@@ -21,11 +21,9 @@ export async function syncCartAction() {
 }
 
 export async function mergeCartAction(guestItems: { productId: string, quantity: number }[]) {
-  console.log("mergeCartAction started on server with items:", guestItems);
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
-    console.log("mergeCartAction token:", token);
     if (!token) {
       console.log("mergeCartAction: No token found, returning null");
       return null;
