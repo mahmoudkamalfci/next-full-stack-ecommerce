@@ -11,9 +11,9 @@ We will use a combined Server-Side + Client-Side approach to achieve a completel
 ```mermaid
 sequenceDiagram
     participant Browser
-    participant ServerAction as Next.js Server Action
-    participant fetchApi as fetchApi Helper
-    participant Backend as Express Backend
+    participant ServerAction as "Next.js Server Action"
+    participant fetchApi as "fetchApi Helper"
+    participant Backend as "Express Backend"
 
     Browser->>ServerAction: Trigger Action (e.g., syncCartAction)
     ServerAction->>fetchApi: Call Endpoint (e.g., /cart)
