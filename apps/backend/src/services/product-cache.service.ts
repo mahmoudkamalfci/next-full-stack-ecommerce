@@ -98,7 +98,7 @@ export async function invalidateProductVariants(productId: number): Promise<void
   const variantIds = await redisClient.sMembers(indexKey);
   if (variantIds.length === 0) return;
 
-  const keysToDelete = variantIds.map((id) => variantKey(Number(id)));
+  const keysToDelete = variantIds.map((id: any) => variantKey(Number(id)));
   await redisClient.del(keysToDelete);
   // Keep the index intact so future invalidations still work.
   // The index entries will be overwritten next time setVariantCache is called.
