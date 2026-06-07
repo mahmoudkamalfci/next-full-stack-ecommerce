@@ -40,6 +40,8 @@ export async function loginAction(data: LoginFormData) {
 
     const result = await response.json()
 
+    console.log("Login result:", result)
+
     if (result.token) {
       const cookieStore = await cookies()
       cookieStore.set("token", result.token, {

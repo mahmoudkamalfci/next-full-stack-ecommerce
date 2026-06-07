@@ -2,13 +2,14 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { CartProduct } from '../types'
 
-interface CartState {
+export interface CartState {
   items: CartProduct[]
   totalPrice: number
   addItem: (product: CartProduct) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
+  setCartFromApi: (items: CartProduct[]) => void
 }
 
 export const useCartStore = create<CartState>()(
@@ -53,6 +54,9 @@ export const useCartStore = create<CartState>()(
       
       // Action: Clear Cart
       clearCart: () => set({ items: [] }),
+
+      // Action: Set Cart From API
+      setCartFromApi: (items: CartProduct[]) => set({ items: Array.isArray(items) ? items : [] }),
     }),
     {
       name: 'cart-storage', // unique name for localStorage key

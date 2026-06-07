@@ -7,6 +7,7 @@ import { Controller, useForm } from "react-hook-form"
 import { Lock, Package } from "lucide-react"
 
 import { useCartStore } from "@/stores/useCartStore"
+import { removeCartItemAction } from "@/actions/cart"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -119,7 +120,10 @@ export function CartClient() {
                                     {item.quantity}
                                 </div>
                                 <button
-                                    onClick={() => removeItem(item.id)}
+                                    onClick={() => {
+                                        removeItem(item.id);
+                                        removeCartItemAction(item.id).catch(e => console.error("Sync failed", e));
+                                    }}
                                     className="text-xs text-gray-400 hover:text-gray-700 underline underline-offset-4 transition-colors"
                                 >
                                     Remove

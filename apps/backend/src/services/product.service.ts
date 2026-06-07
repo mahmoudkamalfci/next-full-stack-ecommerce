@@ -1,5 +1,23 @@
 import { prisma } from '../lib/prisma.js';
 
+// ─── Cache Invalidation Note ─────────────────────────────────────────────────
+// When you add updateProduct / updateVariant / deleteVariant admin mutations:
+//
+//   import { invalidateProductVariants, invalidateVariant } from './product-cache.service.js';
+//
+//   On product update (name, images, category):
+//     await invalidateProductVariants(productId);
+//
+//   On variant update (price, SKU, inventory):
+//     await invalidateVariant(variantId);
+//
+//   On product delete:
+//     await invalidateProductVariants(productId);
+//
+// This busts the Redis cache so getCart re-fetches fresh data from DB.
+// See docs/plans/2026-06-01-redis-product-cache-design.md for full design.
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface ProductQueryFilters {
   q?: string;
   categorySlug?: string;

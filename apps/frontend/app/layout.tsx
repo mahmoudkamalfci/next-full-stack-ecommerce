@@ -3,6 +3,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import SiteFooter from "@/components/site-footer";
+import { CartSyncProvider } from "@/components/CartSyncProvider";
+import { cookies } from "next/headers";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
   description: "Your premier destination for fashion-forward clothing and accessories",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -23,11 +25,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
+        <CartSyncProvider isAuthenticated={!!(await cookies()).get("token")}>
         <Navbar />
         <main className="pt-20">
           {children}
         </main>
         <SiteFooter />
+        </CartSyncProvider>
       </body>
     </html>
   );

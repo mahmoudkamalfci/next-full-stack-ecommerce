@@ -2,11 +2,12 @@ import express, { type Express } from 'express';
 
 import productRouter from './routes/product.routes.js';
 import categoryRouter from './routes/category.routes.js';
-import { cartRouter } from './routes/cart.js';
+import { cartRouter } from './routes/cart.routes.js';
 import { checkoutRouter } from './routes/checkout.js';
 import { userRouter } from './routes/user.routes.js';
 import { adminRouter } from './routes/admin.routes.js';
 import { notFoundHandler, globalErrorHandler } from './middleware/errorHandler.js';
+import redisClient from './lib/redis.js';
 
 export const app: Express = express();
 
@@ -30,8 +31,14 @@ app.use(globalErrorHandler);
 // Only start listening when this file is run directly (not imported by tests)
 const port = process.env.PORT || 4000;
 
+
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  redisClient.connect().then(() => {
+    console.log('Connected to Redis');
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  }).catch((err) => {
+    console.error('Failed to connect to Redis', err);
   });
 }

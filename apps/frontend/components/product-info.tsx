@@ -5,6 +5,7 @@ import { useState, useMemo } from "react";
 import { AddToCartDrawer } from "@/components/add-to-cart-drawer";
 import { clsx } from "clsx";
 import { useCartStore } from "@/stores/useCartStore";
+import { addCartItemAction } from "@/actions/cart";
 import type { ApiProduct } from "@/types/product";
 import { Minus, Plus } from "lucide-react";
 
@@ -50,6 +51,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
     const inventoryQuantity = selectedVariant?.inventoryQuantity || 0;
 
     const handleAddToCart = () => {
+        // 1. Optimistic Update
         addItem({
             id: selectedVariant ? selectedVariant.id.toString() : product.id.toString(),
             sku: sku,
@@ -59,7 +61,13 @@ export function ProductInfo({ product }: ProductInfoProps) {
             quantity: selectedQuantity,
             size: selectedSize,
             color: selectedColor
-        })
+        });
+
+        // 2. Background sync (server action checks if user is logged in automatically)
+        const productId = selectedVariant ? selectedVariant.id.toString() : product.id.toString();
+        addCartItemAction(productId, selectedQuantity).catch(e => {
+            console.error("Sync failed", e);
+        });
     }
 
     const getColorClass = (colorName: string) => {
